@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="SOLID_and_exceptions:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="a080380e-65f3-4db7-9ffa-4bb06a195795" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/8.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/8.1/executionHistory/executionHistory.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/8.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/8.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/../CollectionManagerJDBC/.gradle/file-system.probe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CollectionManagerJDBC/server.log" beforeDir="false" afterPath="$PROJECT_DIR$/../CollectionManagerJDBC/server.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../CollectionManagerTCP/Collection.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../CollectionManagerTCP/Collection.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/artifacts/SOLID_and_exceptions_jar.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SOLID_and_exceptions.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/artifacts/SOLID_and_exceptions_jar/SOLID_and_exceptions.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Main.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Enums/voicesCharacteristic.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Exceptions/misfireException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Exceptions/noGunException.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Heroes/Boy.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Heroes/Carlson$1.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Heroes/Carlson$BunCond.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Heroes/Carlson.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Heroes/Hero.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/InanimatedObjects/Somebody.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/InanimatedObjects/Sound.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/InanimatedObjects/StoryObject.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Interfaces/BoyActions.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Interfaces/Bun.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Interfaces/CarlsonActions.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Interfaces/InanimateActions.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Scene$Voices.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/SOLID_and_exceptions/Scene/Scene.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Enums/voicesCharacteristic.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Exceptions/misfireException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Exceptions/noGunException.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Heroes/Boy.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Heroes/Carlson.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Heroes/Hero.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/InanimatedObjects/Somebody.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/InanimatedObjects/Sound.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/InanimatedObjects/StoryObject.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Interfaces/BoyActions.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Interfaces/Bun.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Interfaces/CarlsonActions.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Interfaces/InanimateActions.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Scene/Scene.java" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2LvfGbH2BLJPyXNgYrrqsl2fKhZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/Other/ITMO/Java SE/SOLIDAndExceptions",
+    "project.structure.last.edited": "Artifacts",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "settings.editor.selected.configurable": "profiler.jvm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="Scene.Heroes" />
+      <recent name="Heroes" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="Main" />
+      <module name="SOLIDAndExceptions" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="a080380e-65f3-4db7-9ffa-4bb06a195795" name="Changes" comment="" />
+      <created>1676756384007</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1676756384007</updated>
+      <workItem from="1676756385418" duration="2508000" />
+      <workItem from="1676808396780" duration="23286000" />
+      <workItem from="1676846248556" duration="65000" />
+      <workItem from="1676901671871" duration="4021000" />
+      <workItem from="1677004939573" duration="11171000" />
+      <workItem from="1677066273285" duration="2848000" />
+      <workItem from="1677324706449" duration="483000" />
+      <workItem from="1684184929902" duration="72000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>
