@@ -19,19 +19,24 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class ConnectionManager {
-    private static Logger LOGGER;
-    private static boolean isLongReply = true;
+    private Logger LOGGER;
+    private boolean isLongReply = true;
+    private ServerSocket socket = null;
 
-    public static void setLogger(Logger LOGGER) {
-        ConnectionManager.LOGGER = LOGGER;
+    public ConnectionManager(Logger logger){
+        this.LOGGER = logger;
     }
 
-    public ServerSocket findPort(){
+    public ServerSocket getSocket(){
+        if (socket != null)
+            return socket;
+
         ServerSocket serverSocket;
         int port = 49152;
         while (true){
             try {
                 serverSocket = new ServerSocket(port);
+                socket = serverSocket;
                 return serverSocket;
             }
             catch (IOException e) {

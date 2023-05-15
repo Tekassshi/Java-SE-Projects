@@ -6,7 +6,6 @@ import comparators.HeightComparator;
 import data.Country;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -32,9 +31,6 @@ import org.slf4j.Logger;
  * */
 public class CollectionManager {
     private Deque<Person> collection = new ArrayDeque<>();
-    private UserCollection collection_wrapper = new UserCollection();
-    private String collection_path;
-    private boolean is_path_exist = false;
 
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -46,37 +42,6 @@ public class CollectionManager {
 
     public CollectionManager(Logger logger){
         this.LOGGER = logger;
-        getCollectionPath();
-        load();
-    }
-
-    /**
-     * Method for checking environmental variable to get path for collection and set it to class field.
-     * */
-    public void getCollectionPath() {
-        String path = System.getenv("Lab6_collection");
-        File out_file;
-
-        if (path == null || !Files.exists(Path.of(path))) {
-            collection_path = System.getProperty("user.dir") + File.separator + "Collection.xml";
-
-            try {
-                out_file = new File(collection_path);
-                out_file.createNewFile();
-                collection_wrapper.setInit_date(ZonedDateTime.now());
-            } catch (IOException e) {
-                LOGGER.error("Error creating new file. Try again.");
-                return;
-            }
-            LOGGER.warn("Wrong environmental variable value, or it's doesn't exist.\n" +
-                    "New collection was created: \"" + collection_path + "\"");
-            return;
-        }
-
-        collection_path = path;
-        is_path_exist = true;
-
-        LOGGER.info("Collection was loaded from \"" + collection_path + "\"");
     }
 
     /**
@@ -224,107 +189,11 @@ public class CollectionManager {
     }
 
     /**
-     * Method for executing "save" user command.
-     * */
-    public void save() {
-
-        if (!Files.isWritable(Path.of(collection_path))) {
-            LOGGER.error("File is unwritable!");
-            File file = new File("Collection_new.xml");
-
-            try {
-                file.createNewFile();
-                collection_path = System.getProperty("user.dir") + File.separator + "Collection_new.xml";
-                LOGGER.info("Collection data will be saved to new file " +
-                        "\"Collection_new.xml\"");
-            }
-            catch (IOException e) {
-                LOGGER.error("Error creating new file for collection." + ANSI_RESET);
-                return;
-            }
-        }
-
-        try (FileOutputStream fos = new FileOutputStream(collection_path);
-             OutputStreamWriter writer = new OutputStreamWriter(fos)) {
-
-            XmlMapper mapper = new XmlMapper();
-            mapper.registerModule(new JavaTimeModule());
-
-            mapper.getFactory().disable(JsonGenerator.Feature.AUTO_CLOSE_TARGET);
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-
-            collection_wrapper.setCollection(collection);
-            mapper.writeValue(writer, collection_wrapper);
-
-            LOGGER.info("Collection was successfully saved.\n");
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Method for loading collection from XML file.
-     * */
-    public void load() {
-        if (!is_path_exist)
-            return;
-
-        File file = new File(collection_path);
-        XmlMapper mapper = new XmlMapper();
-        mapper.registerModule(new JavaTimeModule());
-
-        UserCollection tmp;
-
-        try {
-            tmp = mapper.readValue(file, UserCollection.class);
-        }
-        catch (InvalidFormatException e){
-            LOGGER.error("Wrong data type in \"" + collection_path + "\".\n"
-                    + e.getLocation().toString().replaceAll("\\[|\\]", ""));
-
-            LOGGER.info("A new empty collection has been created.\n");
-            tmp = new UserCollection();
-            tmp.setInit_date(ZonedDateTime.now());
-            collection = tmp.getCollection();
-            collection_wrapper = tmp;
-            return;
-        }
-        catch (IOException e){
-            LOGGER.error("Wrong XML format \"" + collection_path + "\".");
-            LOGGER.info("A new empty collection has been created.\n");
-            tmp = new UserCollection();
-            tmp.setInit_date(ZonedDateTime.now());
-            collection = tmp.getCollection();
-            collection_wrapper = tmp;
-            return;
-        }
-
-        collection = tmp.getCollection();
-        collection_wrapper = tmp;
-
-        LOGGER.info("Checking loaded collection data");
-        checkId();
-        setNextId();
-        defaultSort();
-        LOGGER.info("Collection loaded\n");
-    }
-
-    /**
      * Method for sorting current collection using "DefaultComparator" comparator class.
      * @see DefaultComparator
      * */
     private void defaultSort(){
         collection = collection.stream().sorted(new DefaultComparator())
-                .collect(Collectors.toCollection(ArrayDeque::new));
-    }
-
-    /**
-     * Method for sorting current collection using "HeightComparator" comparator class.
-     * @see HeightComparator
-     * */
-    private void sortByHeight(){
-        collection = collection.stream().sorted(new HeightComparator())
                 .collect(Collectors.toCollection(ArrayDeque::new));
     }
 
@@ -455,7 +324,7 @@ public class CollectionManager {
     public String info(){
         String s = "";
         s += ANSI_GREEN + "\n--- Collection info ---\n" + ANSI_RESET;
-        s += "Date of initialization: " + collection_wrapper.getInit_date() + "\n";
+//        s += "Date of initialization: " + collection_wrapper.getInit_date() + "\n";
         s += "Collection type: ArrayDeque<Person>" + "\n";
         s += "Number of elements: " + collection.size() + "\n\n";
         return s;

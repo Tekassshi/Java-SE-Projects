@@ -19,7 +19,7 @@ public class ConcurrentInput {
                     String inp = reader.readLine();
                     if (!inp.equals("save"))
                         throw new IOException();
-                    manager.save();
+//                    manager.save();
                 } catch (IOException e) {
                     System.out.println("\nWrong command!\n");
                 }

@@ -54,9 +54,8 @@ public class CommandFactory {
         commands.put("print_field_descending_height", new PrintFieldDescendingHeight(collectionManager));
     }
 
-    public static void setLongReplyCommands(){
-        longReplyCommands.add("Show");
-        longReplyCommands.add("PrintFieldDescendingHeight");
-        longReplyCommands.add("FilterByNationality");
+    public static void addLongReplyCommands(String... callName){
+        for (String c: callName)
+            longReplyCommands.add(c);
     }
 }
