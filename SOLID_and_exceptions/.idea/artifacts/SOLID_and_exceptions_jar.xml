@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="SOLID_and_exceptions:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/SOLID_and_exceptions_jar</output-path>
+    <root id="archive" name="SOLID_and_exceptions.jar">
+      <element id="module-output" name="SOLID_and_exceptions" />
+    </root>
+  </artifact>
+</component>

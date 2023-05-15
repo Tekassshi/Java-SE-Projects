@@ -1,0 +1,19 @@
+22:16:19.442 [main] INFO  Server - Server started
+
+22:16:19.459 [main] INFO  Server - Collection was loaded from "D:\Other\ITMO\Java SE\CollectionManagerTCP\Collection.xml"
+22:16:19.729 [main] INFO  Server - Checking loaded collection data
+22:16:19.733 [main] INFO  Server - Collection loaded
+
+22:16:39.659 [main] INFO  Server - Accepted new connection "/127.0.0.1"
+22:16:44.746 [main] INFO  Server - Executing user "Info" command
+22:16:46.722 [main] INFO  Server - Executing user "Show" command
+22:17:03.931 [main] INFO  Server - Executing user "Add" command
+22:17:05.920 [main] INFO  Server - Executing user "Show" command
+22:17:07.949 [main] INFO  Server - Executing user "Info" command
+22:17:11.730 [input] INFO  Server - Collection was successfully saved.
+
+22:17:30.072 [main] INFO  Server - Reading a request
+22:17:30.072 [main] WARN  Server - Force shutdown: /127.0.0.1
+
+22:17:30.083 [main] INFO  Server - Collection was successfully saved.
+

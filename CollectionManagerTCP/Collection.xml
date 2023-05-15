@@ -1,0 +1,23 @@
+<xml>
+  <InitializationDate>2023-05-10T22:59:09Z</InitializationDate>
+  <Collection>
+    <Person>
+      <id>1</id>
+      <name>dkjfv</name>
+      <coordinates>
+        <x>234</x>
+        <y>432</y>
+      </coordinates>
+      <creationDate>2023-05-15T22:16:52+03:00</creationDate>
+      <height>123</height>
+      <weight>432.0</weight>
+      <eyeColor>RED</eyeColor>
+      <nationality>RUSSIA</nationality>
+      <location>
+        <x>23.0</x>
+        <y>423</y>
+        <z>123.0</z>
+      </location>
+    </Person>
+  </Collection>
+</xml>
