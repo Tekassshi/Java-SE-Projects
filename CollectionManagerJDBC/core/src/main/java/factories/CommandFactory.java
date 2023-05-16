@@ -29,7 +29,6 @@ public class CommandFactory {
     }
 
     public static Set<String> scripts = new HashSet<>();
-    public static Set<String> longReplyCommands = new HashSet<>();
 
     /**
      * Setter method that setting "CollectionManager" object for all commands
@@ -52,10 +51,5 @@ public class CommandFactory {
         commands.put("remove_all_by_nationality", new RemoveAllByNationality(collectionManager));
         commands.put("filter_by_nationality", new FilterByNationality(collectionManager));
         commands.put("print_field_descending_height", new PrintFieldDescendingHeight(collectionManager));
-    }
-
-    public static void addLongReplyCommands(String... callName){
-        for (String c: callName)
-            longReplyCommands.add(c);
     }
 }

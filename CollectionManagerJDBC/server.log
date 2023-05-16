@@ -70,3 +70,42 @@
 02:09:51.512 [main] INFO  Server - Reading a request
 02:09:51.512 [main] WARN  Server - Force shutdown: /127.0.0.1
 
+02:31:56.836 [main] INFO  Server - Server started
+
+02:32:13.004 [main] INFO  Server - Accepted new connection "/127.0.0.1"
+02:32:15.047 [main] INFO  Server - Executing user "Info" command
+02:32:18.040 [main] INFO  Server - Executing user "Show" command
+02:32:20.061 [main] INFO  Server - Client "/127.0.0.1" disconnected.
+
+02:32:28.025 [main] INFO  Server - Accepted new connection "/127.0.0.1"
+02:32:31.402 [main] INFO  Server - Reading a request
+02:32:31.402 [main] WARN  Server - Force shutdown: /127.0.0.1
+
+02:32:43.297 [main] INFO  Server - Accepted new connection "/127.0.0.1"
+02:33:13.768 [main] INFO  Server - Reading a request
+02:33:13.768 [main] WARN  Server - Force shutdown: /127.0.0.1
+
+00:52:06.833 [main] ERROR Server - Error connecting to database. Server will be stopped.
+00:52:32.845 [main] ERROR Server - Error connecting to database. Server will be stopped.
+00:52:40.919 [main] ERROR Server - Error connecting to database. Server will be stopped.
+00:56:19.655 [main] ERROR Server - Error connecting to database. Server will be stopped.
+01:16:54.687 [main] ERROR Server - Error connecting to database. Check authorization data. Server will be stopped.
+01:21:42.327 [main] ERROR Server - Error connecting to database. Check authorization data. Server will be stopped.
+01:41:08.197 [main] INFO  Server - Connection with database was successfully established.
+02:15:12.082 [main] INFO  Server - Server started
+
+02:15:12.383 [main] INFO  Server - Connection with database was successfully established.
+02:15:12.391 [main] INFO  Server - Collection was successfully loaded from database.
+02:15:41.488 [main] INFO  Server - Server started
+
+02:15:41.783 [main] INFO  Server - Connection with database was successfully established.
+02:15:41.783 [main] INFO  Server - Collection was successfully loaded from database.
+02:16:07.925 [main] INFO  Server - Server started
+
+02:16:08.231 [main] INFO  Server - Connection with database was successfully established.
+02:16:08.231 [main] INFO  Server - Collection was successfully loaded from database.
+02:16:08.231 [main] INFO  Server - Request processor was started successfully.
+
+02:20:49.112 [main] INFO  Server - Server started
+
+02:20:49.556 [main] INFO  Server - Connection with database was successfully established.

@@ -3,7 +3,6 @@ package util;
 import commands.AbstractCommand;
 import connection.SerializationManager;
 import connection.ServerResponse;
-import factories.CommandFactory;
 import interfaces.Command;
 import managers.CollectionManager;
 import org.slf4j.Logger;
@@ -11,12 +10,19 @@ import org.slf4j.Logger;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashSet;
+import java.util.Set;
+
+import static managers.CollectionManager.ANSI_GREEN;
+import static managers.CollectionManager.ANSI_RESET;
 
 public class RequestProcessor {
     private ConnectionManager connectionManager;
     private CollectionManager collectionManager;
     private ServerSocket serverSocket;
     private Logger logger;
+
+    private Set<String> longReplyCommands = new HashSet<>();
 
     public RequestProcessor(ConnectionManager connectionManager, CollectionManager collectionManager, Logger logger) {
         this.connectionManager = connectionManager;
@@ -26,6 +32,11 @@ public class RequestProcessor {
     }
 
     public void run() throws InterruptedException {
+        if (serverSocket == null) return;
+
+        logger.info("Request processor was started successfully.\n");
+        System.out.println("Server is currently running on port: " + ANSI_GREEN + serverSocket.getLocalPort()
+                + ANSI_RESET + "\n");
 
         while (true){
 
@@ -49,7 +60,7 @@ public class RequestProcessor {
 
                     String commandName = command.getClass().getSimpleName();
                     if (collectionManager.getCollectionSize() > 40 &&
-                            CommandFactory.longReplyCommands.contains(commandName)){
+                            longReplyCommands.contains(commandName)){
 
                         connectionManager.sendLongResponse(command, collectionManager, socket);
                         continue;
@@ -67,11 +78,15 @@ public class RequestProcessor {
                     ServerResponse response = new ServerResponse(commandRes);
                     connectionManager.sendResponse(socket, response);
                 }
-
             }
             catch (IOException | ClassNotFoundException e){
                 logger.error("Error user command executing. Connection refused.");
             }
         }
+    }
+
+    public void addLongRepCommands(String ... callName){
+        for (String c: callName)
+            longReplyCommands.add(c);
     }
 }

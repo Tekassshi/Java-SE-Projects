@@ -1,0 +1,37 @@
+create table Color (
+    color_id serial primary key,
+    color_name text
+);
+
+insert into Color (color_name)
+values ('GREEN'),
+       ('RED'),
+       ('BLACK'),
+       ('BLUE'),
+       ('YELLOW');
+
+create table Country(
+    country_id serial primary key,
+    country_name text
+);
+
+insert into Country(country_name)
+values ('RUSSIA'),
+       ('FRANCE'),
+       ('THAILAND'),
+       ('NORTH_KOREA');
+
+create table Collection (
+    id serial primary key,
+    name text,
+    coord_x bigint,
+    coord_y bigint,
+    creation_date timestamp,
+    height real,
+    weight real,
+    eye_color int references color,
+    nationality int references country,
+    location_x int,
+    location_y real,
+    location_z double precision
+);

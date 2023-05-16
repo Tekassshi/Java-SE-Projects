@@ -4,18 +4,14 @@ import commands.FilterByNationality;
 import comparators.DefaultComparator;
 import comparators.HeightComparator;
 import data.Country;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import data.Person;
 import data.UserCollection;
 
-import java.io.*;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,17 +27,23 @@ import org.slf4j.Logger;
  * */
 public class CollectionManager {
     private Deque<Person> collection = new ArrayDeque<>();
+    private Connection connection;
 
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_RESET = "\u001B[0m";
 
-    private Long id = Long.valueOf(1);
-
     private Logger LOGGER;
 
-    public CollectionManager(Logger logger){
+    public CollectionManager(Connection connection, Logger logger){
+        this.connection = connection;
         this.LOGGER = logger;
+    }
+
+    public void loadCollection() throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet set = statement.executeQuery("" +
+                "SELECT * FROM collection");
     }
 
     /**
@@ -86,8 +88,8 @@ public class CollectionManager {
      * @param person "Person" class object to add to current collection.
      * */
     public String add(Person person) {
-        person.setId(id);
-        id++;
+//        person.setId(id);
+//        id++;
 
         collection.add(person);
         defaultSort();
@@ -100,8 +102,8 @@ public class CollectionManager {
      * @param person "Person" class object to add to current collection.
      * */
     public String addIfMin(Person person) {
-        person.setId(id);
-        id += 1;
+//        person.setId(id);
+//        id += 1;
 
         collection.add(person);
         defaultSort();
@@ -184,7 +186,7 @@ public class CollectionManager {
         }
 
         collection.removeAll(collection);
-        id = Long.valueOf(1);
+//        id = Long.valueOf(1);
         return ANSI_GREEN + "\nCollection was successfully cleared.\n" + ANSI_RESET;
     }
 
@@ -224,11 +226,11 @@ public class CollectionManager {
      * Method count a number of nodes in current collection and set "id" value that should be set for new next node.
      * */
     private void setNextId(){
-        if (collection.size() == 0){
-            id = Long.valueOf(1);
-            return;
-        }
-        id = collection.stream().max(Comparator.comparingLong(Person::getId)).get().getId() + 1;
+//        if (collection.size() == 0){
+//            id = Long.valueOf(1);
+//            return;
+//        }
+//        id = collection.stream().max(Comparator.comparingLong(Person::getId)).get().getId() + 1;
     }
 
     /**
@@ -251,7 +253,9 @@ public class CollectionManager {
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
-        person.setId(id++);
+
+//        person.setId(id++);
+
         collection.add(person);
 
         DefaultComparator comparator = new DefaultComparator();
@@ -350,5 +354,9 @@ public class CollectionManager {
 
     public ArrayDeque getCollection(){
         return (ArrayDeque) collection;
+    }
+
+    public void setConnection(Connection connection) {
+        this.connection = connection;
     }
 }
