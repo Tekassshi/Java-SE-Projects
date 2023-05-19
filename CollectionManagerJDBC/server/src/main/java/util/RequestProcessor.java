@@ -46,26 +46,22 @@ public class RequestProcessor {
 
                 while (true){
                     byte[] arr = connectionManager.readRequest(socket);
-                if (arr == null) {
-//                    collectionManager.save();
-                    break;
-                }
+
+                    if (arr == null) {
+                        break;
+                    }
 
                     Object obj = SerializationManager.deserialize(arr);
-
                     AbstractCommand command = (AbstractCommand) obj;
                     command.setCollectionManager(collectionManager);
-
                     logger.info("Executing user \"" + command.getClass().getSimpleName() + "\" command");
-
                     String commandName = command.getClass().getSimpleName();
+
                     if (collectionManager.getCollectionSize() > 40 &&
                             longReplyCommands.contains(commandName)){
-
                         connectionManager.sendLongResponse(command, collectionManager, socket);
                         continue;
                     }
-
                     String commandRes;
                     try {
                         commandRes = ((Command) command).execute();
@@ -74,7 +70,6 @@ public class RequestProcessor {
                         logger.error("Error command \"" + command.getClass().getSimpleName() + "\" executing.");
                         continue;
                     }
-
                     ServerResponse response = new ServerResponse(commandRes);
                     connectionManager.sendResponse(socket, response);
                 }

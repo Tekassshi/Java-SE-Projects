@@ -93,21 +93,18 @@ public class InputManager {
      * @return valid "coordinates" field "Coordinates" value.
      * */
     public static Coordinates readCoordinates(){
-        Coordinates coordinates = new Coordinates();
-
         while (true){
             try {
                 System.out.print("\nEnter \"X\" coord (integer value): ");
                 int x = Integer.parseInt(reader.readLine());
                 if (x <= -783)
                     throw new NumberFormatException();
-                coordinates.setX(x);
 
                 System.out.print("Enter \"Y\" coord (long integer value): ");
                 Long y = Long.parseLong(reader.readLine());
-                coordinates.setY(y);
                 System.out.println("");
 
+                Coordinates coordinates = new Coordinates(x, y);
                 return coordinates;
             }
             catch (NumberFormatException | IOException e){
@@ -125,16 +122,15 @@ public class InputManager {
      * @throws NumberFormatException if given stream contains incorrect data
      * */
     public static Coordinates readCoordinatesScript(BufferedReader reader) throws IOException, NumberFormatException {
-        Coordinates coordinates = new Coordinates();
 
         int x = Integer.parseInt(reader.readLine());
 
         if (x <= -783)
             throw new NumberFormatException();
 
-        coordinates.setX(x);
         Long y = Long.parseLong(reader.readLine());
-        coordinates.setY(y);
+
+        Coordinates coordinates = new Coordinates(x, y);
         return coordinates;
     }
 
@@ -318,27 +314,22 @@ public class InputManager {
      * @return valid "location" field, Location class object.
      * */
     public static Location readLocation(){
-        Location location = new Location();
-
         while (true){
             try {
                 System.out.print("\nEnter \"X\" coord (Float value): ");
-                Float x = Float.parseFloat(reader.readLine().replaceAll(",", "."));
+                Integer x = Integer.parseInt(reader.readLine());
 
                 if(x == Float.POSITIVE_INFINITY || x == Float.NEGATIVE_INFINITY)
                     throw new NumberFormatException();
 
-                location.setX(x);
-
                 System.out.print("Enter \"Y\" coord (Integer value): ");
-                Integer y = Integer.parseInt(reader.readLine());
-                location.setY(y);
+                Float y = Float.parseFloat(reader.readLine().replaceAll(",", "."));
 
                 System.out.print("Enter \"Z\" coord (Double value): ");
                 Double z = Double.parseDouble(reader.readLine().replaceAll(",", "."));
-                location.setZ(z);
                 System.out.println("");
 
+                Location location = new Location(x, y, z);
                 return location;
             }
             catch (NumberFormatException | IOException e){
@@ -356,16 +347,14 @@ public class InputManager {
      * @throws IOException if given stream contains incorrect data
      * */
     public static Location readLocationScript(BufferedReader reader) throws IOException {
-        Location location = new Location();
 
-        Float x = Float.parseFloat(reader.readLine().replaceAll(",", "."));
-        location.setX(x);
+        Integer x = Integer.parseInt(reader.readLine());
 
-        Integer y = Integer.parseInt(reader.readLine());
-        location.setY(y);
+        Float y = Float.parseFloat(reader.readLine().replaceAll(",", "."));
 
         Double z = Double.parseDouble(reader.readLine().replaceAll(",", "."));
-        location.setZ(z);
+
+        Location location = new Location(x, y, z);
         return location;
     }
 

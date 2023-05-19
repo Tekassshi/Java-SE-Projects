@@ -7,13 +7,18 @@ import java.io.Serializable;
  * */
 public class Coordinates implements Serializable {
 
-    private int x;
+    private long x;
     private Long y;
+
+    public Coordinates(long x, Long y){
+        this.x = x;
+        this.y = y;
+    }
 
     /**
      * @return "x" coordinate int value.
      * */
-    public int getX() {
+    public long getX() {
         return x;
     }
 
@@ -21,7 +26,7 @@ public class Coordinates implements Serializable {
      * Setter method to set "x" coordinate value.
      * @param x coordinate int value
      * */
-    public void setX(int x) {
+    public void setX(long x) {
         this.x = x;
     }
 

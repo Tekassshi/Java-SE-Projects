@@ -3,20 +3,13 @@ package managers;
 import commands.FilterByNationality;
 import comparators.DefaultComparator;
 import comparators.HeightComparator;
-import data.Country;
+import data.*;
 
-import data.Person;
-import data.UserCollection;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -40,10 +33,114 @@ public class CollectionManager {
         this.LOGGER = logger;
     }
 
-    public void loadCollection() throws SQLException {
+    private Person getPersonFromRow(ResultSet rs) throws SQLException {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        long coord_x = rs.getLong("coord_x");
+        long coord_y = rs.getLong("coord_y");
+
+        Timestamp creation_date_ts = rs.getTimestamp("creation_date");
+        LocalDateTime localDateTime = creation_date_ts.toLocalDateTime();
+        ZonedDateTime creation_date = localDateTime.atZone(ZoneId.systemDefault());
+
+        Integer height = rs.getInt("height");
+        Float weight = rs.getFloat("weight");
+        Color eye_color = Color.valueOf(rs.getString("color_name"));
+        Country nationality = Country.valueOf(rs.getString("country_name"));
+        Integer location_x = rs.getInt("location_x");
+        Float location_y = rs.getFloat("location_y");
+        Double location_z = rs.getDouble("location_z");
+
+        Coordinates coordinates = new Coordinates(coord_x, coord_y);
+        Location location = new Location(location_x, location_y, location_z);
+
+        Person person = new Person.Builder()
+                .id(id)
+                .name(name)
+                .coordinates(coordinates)
+                .dateTime(creation_date)
+                .height(height)
+                .weight(weight)
+                .eyeColor(eye_color)
+                .nationality(nationality)
+                .location(location)
+                .build();
+
+        return person;
+    }
+
+    private ArrayDeque<Person> getResultSetData(ResultSet rs) throws SQLException, IllegalArgumentException {
+        ArrayDeque<Person> result = new ArrayDeque<>();
+
+        while (rs.next()) {
+            Person person = getPersonFromRow(rs);
+            result.add(person);
+        }
+        return result;
+    }
+
+    private ResultSet getCompleteDataFromDb() throws SQLException {
         Statement statement = connection.createStatement();
-        ResultSet set = statement.executeQuery("" +
-                "SELECT * FROM collection");
+        ResultSet set = statement.executeQuery(
+                "SELECT * FROM " +
+                        "collection " +
+                        "JOIN color on collection.eye_color = color.color_id " +
+                        "JOIN country on collection.nationality = country.country_id");
+        return set;
+    }
+
+    public void loadCollection() throws SQLException {
+        collection = getResultSetData(getCompleteDataFromDb());
+        defaultSort();
+        LOGGER.info("Collection was loaded successfully");
+    }
+
+    private int getColorKeyFromTable(String color) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT color_id FROM color WHERE color_name = ?;");
+
+        statement.setString(1, color);
+        ResultSet rs = statement.executeQuery();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    private int getCountryKeyFromTable(String country) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT country_id FROM country WHERE country_name = ?;");
+
+        statement.setString(1, country);
+        ResultSet rs = statement.executeQuery();
+        rs.next();
+        return rs.getInt(1);
+    }
+
+    private void insertPersonQuery(Person person) throws SQLException{
+        PreparedStatement statement = connection.prepareStatement(
+                "INSERT INTO collection(name, coord_x, coord_y, creation_date, height, weight, eye_color, " +
+                        "nationality, location_x, location_y, location_z)" +
+                        "values " +
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+
+        int color_id = getColorKeyFromTable(person.getEyeColor().toString());
+        int nationality = getCountryKeyFromTable(person.getNationality().toString());
+
+        statement.setString(1, person.getName());
+        statement.setLong(2, person.getCoordinates().getX());
+        statement.setLong(3, person.getCoordinates().getY());
+
+        ZonedDateTime tmp = person.getCreationDate();
+        statement.setTimestamp(4, Timestamp.valueOf(tmp.toLocalDateTime()));
+
+        statement.setInt(5, person.getHeight());
+        statement.setFloat(6, person.getWeight());
+        statement.setInt(7, color_id);
+        statement.setInt(8, nationality);
+        statement.setInt(9, person.getLocation().getX());
+        statement.setFloat(10, person.getLocation().getY());
+        statement.setDouble(11, person.getLocation().getZ());
+
+        statement.execute();
     }
 
     /**
@@ -88,12 +185,16 @@ public class CollectionManager {
      * @param person "Person" class object to add to current collection.
      * */
     public String add(Person person) {
-//        person.setId(id);
-//        id++;
-
-        collection.add(person);
-        defaultSort();
-        return ANSI_GREEN + "Person was added successfully!\n" + ANSI_RESET;
+        try {
+            insertPersonQuery(person);
+            loadCollection();
+            defaultSort();
+            return ANSI_GREEN + "Person was added successfully!\n" + ANSI_RESET;
+        }
+        catch (SQLException e) {
+            LOGGER.warn("Error inserting or load data from database.");
+            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+        }
     }
 
     /**
@@ -102,22 +203,28 @@ public class CollectionManager {
      * @param person "Person" class object to add to current collection.
      * */
     public String addIfMin(Person person) {
-//        person.setId(id);
-//        id += 1;
 
-        collection.add(person);
-        defaultSort();
+        Person toCompare = collection.peekFirst();
+        DefaultComparator defaultComparator = new DefaultComparator();
+        int compareRes = defaultComparator.compare(person, toCompare);
 
-        if (person != collection.peekFirst()) {
-            collection.remove(person);
+        if (compareRes >= 0) {
             String s = "";
             s += ANSI_RED + "\nYour element value is bigger or the same " +
                     "than min element in collection\n" + ANSI_RESET;
             s += ANSI_RED + "Element will not be recorded.\n" + ANSI_RESET;
             return s;
         }
-        else {
-            return ANSI_GREEN + "\nElement was recorded successfully!\n" + ANSI_RESET;
+
+        try {
+            insertPersonQuery(person);
+            loadCollection();
+            defaultSort();
+            return ANSI_GREEN + "Person was added successfully!\n" + ANSI_RESET;
+        }
+        catch (SQLException e) {
+            LOGGER.warn("Error inserting or load data from database.");
+            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
         }
     }
 
@@ -131,23 +238,60 @@ public class CollectionManager {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
 
-        if (!isIdExist(person.getId())) {
-            String s = ANSI_RED + "\nId, that you want to update, doesn't exist!" + ANSI_RESET;
-            s += ANSI_RED + "\nTry again\n" + ANSI_RESET;
-            return s;
+        try {
+            if (!isIdExist((int) person.getId())) {
+                String s = ANSI_RED + "\nId, that you want to update, doesn't exist!" + ANSI_RESET;
+                s += ANSI_RED + "\nTry again\n" + ANSI_RESET;
+                return s;
+            }
+            updatePersonQuery(person);
+            loadCollection();
+            defaultSort();
+            return ANSI_GREEN + "\nPerson with id = " + person.getId() + " was successfully updated!\n";
         }
+        catch (SQLException e) {
+            LOGGER.warn("Error inserting or load data from database.");
+            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+        }
+    }
 
-        Person to_remove = collection.stream().filter(x -> x.getId() ==
-                person.getId()).toList().get(0);
+    private void updatePersonQuery(Person person) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "UPDATE collection SET " +
+                        "name = ?," +
+                        "coord_x = ?," +
+                        "coord_y = ?," +
+                        "creation_date = ?," +
+                        "height = ?," +
+                        "weight = ?," +
+                        "eye_color = ?," +
+                        "nationality = ?," +
+                        "location_x = ?," +
+                        "location_y = ?," +
+                        "location_z = ? " +
+                        "WHERE id = ?;"
+        );
 
-        ZonedDateTime old = to_remove.getCreationDate();
-        person.setCreationDate(old);
+        int color_id = getColorKeyFromTable(person.getEyeColor().toString());
+        int nationality = getCountryKeyFromTable(person.getNationality().toString());
 
-        collection.remove(to_remove);
-        collection.add(person);
+        statement.setString(1, person.getName());
+        statement.setLong(2, person.getCoordinates().getX());
+        statement.setLong(3, person.getCoordinates().getY());
 
-        defaultSort();
-        return ANSI_GREEN + "\nPerson with id = " + person.getId() + " was successfully updated!\n";
+        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+        statement.setTimestamp(4, currentTime);
+
+        statement.setInt(5, person.getHeight());
+        statement.setFloat(6, person.getWeight());
+        statement.setInt(7, color_id);
+        statement.setInt(8, nationality);
+        statement.setInt(9, person.getLocation().getX());
+        statement.setFloat(10, person.getLocation().getY());
+        statement.setDouble(11, person.getLocation().getZ());
+        statement.setInt(12, (int) person.getId());
+
+        statement.executeUpdate();
     }
 
     /**
@@ -156,23 +300,30 @@ public class CollectionManager {
      * @param id node "id" field value that we should remove from current collection.
      * */
     public String removeById(int id) {
-
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
 
-        Map<Boolean, List<Person>> partitions =
-                collection.stream().collect(Collectors.partitioningBy(x -> x.getId() == id));
-        collection = new ArrayDeque<>(partitions.get(false));
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "DELETE FROM collection WHERE id = ?;"
+            );
+            statement.setInt(1, id);
+            int res = statement.executeUpdate();
 
-        if (partitions.get(true).size() == 0) {
-            String s = "";
-            s += ANSI_RED + "\nPerson with given id value doesn't exist!" + ANSI_RESET;
-            s += ANSI_RED + "Try again.\n" + ANSI_RESET;
-            return s;
-        } else {
+            if (res == 0) {
+                String s = "";
+                s += ANSI_RED + "\nPerson with given id value doesn't exist!" + ANSI_RESET;
+                s += ANSI_RED + "Try again.\n" + ANSI_RESET;
+                return s;
+            }
+            loadCollection();
             defaultSort();
             return ANSI_GREEN + "\nPerson with id = " + id + " was successfully removed!\n" + ANSI_RESET;
+        }
+        catch (SQLException e) {
+            LOGGER.warn("Error with database.");
+            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
         }
     }
 
@@ -185,9 +336,16 @@ public class CollectionManager {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
 
-        collection.removeAll(collection);
-//        id = Long.valueOf(1);
-        return ANSI_GREEN + "\nCollection was successfully cleared.\n" + ANSI_RESET;
+        try {
+            Statement statement = connection.createStatement();
+            statement.execute("TRUNCATE TABLE collection RESTART IDENTITY");
+            loadCollection();
+            return ANSI_GREEN + "\nCollection was successfully cleared.\n" + ANSI_RESET;
+        }
+        catch (SQLException e) {
+            LOGGER.warn("Error with database.");
+            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+        }
     }
 
     /**
@@ -199,45 +357,11 @@ public class CollectionManager {
                 .collect(Collectors.toCollection(ArrayDeque::new));
     }
 
-    public static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Set<Object> seen = ConcurrentHashMap.newKeySet();
-        return t -> seen.add(keyExtractor.apply(t));
-    }
-
-    /**
-     * Method for same "id" field existence check. Removes nodes from current collection that have an already
-     * existing "id" field value.
-     * */
-    private void checkId(){
-        if (collection.size() == 0)
-            return;
-
-        Map<Boolean, List<Person>> partitions = collection.stream().
-                collect(Collectors.partitioningBy(distinctByKey(Person::getId)));
-
-        partitions.get(false).stream().forEach(x ->
-                LOGGER.warn(
-                        "Person with id: " + x.getId() + " is already exists.\n" +
-                        "Node will be removed.\n"));
-        partitions.get(false).stream().forEach(x -> collection.remove(x));
-    }
-
-    /**
-     * Method count a number of nodes in current collection and set "id" value that should be set for new next node.
-     * */
-    private void setNextId(){
-//        if (collection.size() == 0){
-//            id = Long.valueOf(1);
-//            return;
-//        }
-//        id = collection.stream().max(Comparator.comparingLong(Person::getId)).get().getId() + 1;
-    }
-
     /**
      * Method for executing "head" user command.
      * @see commands.Head
      * */
-    public String  head(){
+    public String head(){
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -254,14 +378,24 @@ public class CollectionManager {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
 
-//        person.setId(id++);
+        try {
+            DefaultComparator comparator = new DefaultComparator();
+            PreparedStatement statement = connection.prepareStatement("DELETE FROM collection WHERE id = ?;");
 
-        collection.add(person);
-
-        DefaultComparator comparator = new DefaultComparator();
-        collection = collection.stream().sorted(new DefaultComparator()).
-                filter(x -> comparator.compare(x, person) < 0).collect(Collectors.toCollection(ArrayDeque::new));
-        return ANSI_GREEN + "\nPersons have been successfully removed!\n" + ANSI_RESET;
+            for (Person toCompare: collection){
+                if (comparator.compare(person, toCompare) < 0) {
+                    statement.setInt(1, (int) toCompare.getId());
+                    statement.execute();
+                }
+            }
+            loadCollection();
+            defaultSort();
+            return ANSI_GREEN + "\nPersons have been successfully removed!\n" + ANSI_RESET;
+        }
+        catch (SQLException e){
+            LOGGER.warn("Error with database.");
+            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+        }
     }
 
     /**
@@ -274,10 +408,21 @@ public class CollectionManager {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
 
-        collection = collection.stream().filter(x -> x.getNationality() != nationality)
-                .collect(Collectors.toCollection(ArrayDeque::new));
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "DELETE FROM collection WHERE nationality = ?;");
 
-        return ANSI_GREEN + "\nPersons have been successfully removed!\n" + ANSI_RESET;
+            int nationalityInd = getCountryKeyFromTable(nationality.toString());
+            statement.setInt(1, nationalityInd);
+            statement.execute();
+            loadCollection();
+            defaultSort();
+            return ANSI_GREEN + "\nPersons have been successfully removed!\n" + ANSI_RESET;
+        }
+        catch (SQLException e) {
+            LOGGER.warn("Error with database.");
+            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+        }
     }
 
     /**
@@ -317,8 +462,16 @@ public class CollectionManager {
     /** Utility method for checking given id on existence in current collection.
      * @param id "id" field value to checking.
      * */
-    public boolean isIdExist(Long id){
-       return collection.stream().anyMatch(x -> x.getId() == id);
+    public boolean isIdExist(Integer id) throws SQLException{
+       PreparedStatement statement = connection.prepareStatement(
+               "SELECT FROM collection where id = ?;");
+       statement.setInt(1, id);
+       ResultSet set = statement.executeQuery();
+
+       if (!set.isBeforeFirst())
+           return false;
+       else
+           return true;
     }
 
     /**
@@ -328,7 +481,6 @@ public class CollectionManager {
     public String info(){
         String s = "";
         s += ANSI_GREEN + "\n--- Collection info ---\n" + ANSI_RESET;
-//        s += "Date of initialization: " + collection_wrapper.getInit_date() + "\n";
         s += "Collection type: ArrayDeque<Person>" + "\n";
         s += "Number of elements: " + collection.size() + "\n\n";
         return s;

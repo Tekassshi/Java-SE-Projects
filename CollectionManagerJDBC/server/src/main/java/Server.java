@@ -1,18 +1,16 @@
 import managers.CollectionManager;
 import org.slf4j.LoggerFactory;
-import util.ConcurrentInput;
 import util.ConnectionManager;
 import util.DatabaseManager;
 import util.RequestProcessor;
 
 import java.io.IOException;
-import java.net.ConnectException;
 import java.sql.SQLException;
 
 public class Server {
     private static org.slf4j.Logger logger = LoggerFactory.getLogger(Server.class);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
 
         logger.info("Server started\n");
         DatabaseManager dbManager = new DatabaseManager();
@@ -28,32 +26,26 @@ public class Server {
 
             ConnectionManager connectionManager = new ConnectionManager(logger);
 
-            ConcurrentInput.createInputThread(collectionManager); // fix dependencies
-
             RequestProcessor requestProcessor = new RequestProcessor(connectionManager, collectionManager, logger);
             requestProcessor.addLongRepCommands("Show", "FilterByNationality", "PrintFieldDescendingHeight");
 
             requestProcessor.run();
         }
-        catch (InterruptedException e){
-            logger.error("Request processor error. Server will be stopped.\n");
+        catch (IllegalArgumentException e){
+            logger.error("Error reading database. Check data for compatibility with current app version. " +
+                    "Server stopped.");
+            dbManager.closeConnection();
         }
-        catch (ConnectException e){
-            logger.error("Error connecting to database. Server will be stopped.\n");
+        catch (InterruptedException e){
+            logger.error("Request processor error. Server stopped.\n");
+            dbManager.closeConnection();
         }
         catch (SQLException e) {
-            logger.error("Error connecting to database. Check authorization data. Server will be stopped.\n");
+            logger.error("Error access to database. Check \".credentials\" file \nor make sure " +
+                    "the database is running. Server stopped.\n");
         }
         catch (IOException e){
-            logger.error("Error reading \".properties\" file or it's doesn't exist. Server will be stopped.\n");
-        }
-        finally {
-            try {
-                dbManager.closeConnection();
-            }
-            catch (SQLException e){
-                logger.error("Database connection closing error.\n");
-            }
+            logger.error("Error reading \".credentials\" file or it's doesn't exist. Server stopped.\n");
         }
     }
 }

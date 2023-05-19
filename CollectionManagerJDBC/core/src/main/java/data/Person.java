@@ -5,6 +5,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 /**
  * Person class that contains only state fields. Used for storing it objects in collection.
@@ -24,6 +25,66 @@ public class Person implements Serializable {
     private Color eyeColor;
     private Country nationality;
     private Location location;
+
+    /**
+     * Builder design pattern for Person class.
+     * */
+    public static class Builder {
+        private Person person;
+
+        public Builder() {
+            person = new Person();
+        }
+
+        public Builder id (long id){
+            person.id = id;
+            return this;
+        }
+
+        public Builder name(String name){
+            person.name = name;
+            return this;
+        }
+
+        public Builder coordinates(Coordinates coordinates){
+            person.coordinates = coordinates;
+            return this;
+        }
+
+        public Builder dateTime(ZonedDateTime date){
+            person.creationDate = date;
+            return this;
+        }
+
+        public Builder height(Integer height){
+            person.height = height;
+            return this;
+        }
+
+        public Builder weight(Float weight){
+            person.weight = weight;
+            return this;
+        }
+
+        public Builder eyeColor(Color eyeColor){
+            person.eyeColor = eyeColor;
+            return this;
+        }
+
+        public Builder nationality(Country nationality){
+            person.nationality = nationality;
+            return this;
+        }
+
+        public Builder location(Location location){
+            person.location = location;
+            return this;
+        }
+
+        public Person build(){
+            return person;
+        }
+    }
 
     /**
      * @return "id" field long value.

@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.sql.*;
 import java.util.Properties;
 
@@ -33,14 +32,22 @@ public class DatabaseManager {
         BufferedReader reader = new BufferedReader(fileReader);
 
         String property;
-        while ((property = reader.readLine()) != null) {
-            String[] tmp = property.split("=");
+        try {
+            while ((property = reader.readLine()) != null) {
+                String[] tmp = property.split("=");
 
-            if (tmp[0].equals("psqlUser"))
-                user = tmp[1];
-            else if (tmp[0].equals("userPass"))
-                password = tmp[1];
+                if (tmp[0].equals("psqlUser"))
+                    user = tmp[1];
+                else if (tmp[0].equals("userPass"))
+                    password = tmp[1];
+            }
         }
+        catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+            throw new SQLException();
+        }
+
+        if (user == null || password == null)
+            throw new SQLException();
 
         Properties properties = new Properties();
         properties.setProperty("user", user);
@@ -50,18 +57,13 @@ public class DatabaseManager {
         schema = connection.getSchema();
     }
 
-    public void checkDatabase() throws ConnectException {
-        try {
-            if (!isColorTableExist())
-                createColorTable();
-            if (!isCountryTableExist())
-                createCountryTable();
-            if (!isCollectionTableExist())
-                createCollectionTable();
-        }
-        catch (SQLException e) {
-            throw new ConnectException();
-        }
+    public void checkDatabase() throws SQLException {
+        if (!isColorTableExist())
+            createColorTable();
+        if (!isCountryTableExist())
+            createCountryTable();
+        if (!isCollectionTableExist())
+            createCollectionTable();
     }
 
     public boolean isColorTableExist() throws SQLException {

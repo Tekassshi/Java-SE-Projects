@@ -7,14 +7,20 @@ import java.io.Serializable;
  * */
 public class Location implements Serializable {
 
-    private Float x;
-    private Integer y;
+    private Integer x;
+    private Float y;
     private Double z;
+
+    public Location(Integer x, Float y, Double z){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
 
     /**
      * @return "x" coordinate Float value.
      * */
-    public Float getX() {
+    public Integer getX() {
         return x;
     }
 
@@ -22,14 +28,14 @@ public class Location implements Serializable {
      * Setter method to set "x" coordinate value.
      * @param x coordinate Float value
      * */
-    public void setX(Float x) {
+    public void setX(Integer x) {
         this.x = x;
     }
 
     /**
      * @return "y" coordinate Integer value.
      * */
-    public Integer getY() {
+    public Float getY() {
         return y;
     }
 
@@ -37,7 +43,7 @@ public class Location implements Serializable {
      * Setter method to set "y" coordinate value.
      * @param y coordinate Integer value
      * */
-    public void setY(Integer y) {
+    public void setY(Float y) {
         this.y = y;
     }
 
