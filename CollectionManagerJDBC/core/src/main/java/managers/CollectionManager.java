@@ -26,6 +26,7 @@ public class CollectionManager {
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_RESET = "\u001B[0m";
 
+    private String username;
     private Logger LOGGER;
 
     public CollectionManager(Connection connection, Logger logger){
@@ -54,6 +55,8 @@ public class CollectionManager {
         Coordinates coordinates = new Coordinates(coord_x, coord_y);
         Location location = new Location(location_x, location_y, location_z);
 
+        String username = rs.getString("username");
+
         Person person = new Person.Builder()
                 .id(id)
                 .name(name)
@@ -64,6 +67,7 @@ public class CollectionManager {
                 .eyeColor(eye_color)
                 .nationality(nationality)
                 .location(location)
+                .username(username)
                 .build();
 
         return person;
@@ -85,7 +89,8 @@ public class CollectionManager {
                 "SELECT * FROM " +
                         "collection " +
                         "JOIN color on collection.eye_color = color.color_id " +
-                        "JOIN country on collection.nationality = country.country_id");
+                        "JOIN country on collection.nationality = country.country_id " +
+                        "JOIN users on collection.user_id = users.id;");
         return set;
     }
 
@@ -93,6 +98,16 @@ public class CollectionManager {
         collection = getResultSetData(getCompleteDataFromDb());
         defaultSort();
         LOGGER.info("Collection was loaded successfully");
+    }
+
+    private int getUserId(String username) throws SQLException {
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT id FROM users WHERE username = ?;"
+        );
+        statement.setString(1, username);
+        ResultSet set = statement.executeQuery();
+        set.next();
+        return set.getInt("id");
     }
 
     private int getColorKeyFromTable(String color) throws SQLException {
@@ -118,9 +133,9 @@ public class CollectionManager {
     private void insertPersonQuery(Person person) throws SQLException{
         PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO collection(name, coord_x, coord_y, creation_date, height, weight, eye_color, " +
-                        "nationality, location_x, location_y, location_z)" +
+                        "nationality, location_x, location_y, location_z, user_id)" +
                         "values " +
-                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+                        "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
 
         int color_id = getColorKeyFromTable(person.getEyeColor().toString());
         int nationality = getCountryKeyFromTable(person.getNationality().toString());
@@ -139,6 +154,7 @@ public class CollectionManager {
         statement.setInt(9, person.getLocation().getX());
         statement.setFloat(10, person.getLocation().getY());
         statement.setDouble(11, person.getLocation().getZ());
+        statement.setInt(12, getUserId(username));
 
         statement.execute();
     }
@@ -175,7 +191,8 @@ public class CollectionManager {
         s += "Eye color: " + person.getEyeColor() + "\n";
         s += "Nationality: " + person.getNationality() + "\n";
         s += "Location: x = \"" + person.getLocation().getX() + "\", y = \"" +
-                person.getLocation().getY() + "\", z = \"" + person.getLocation().getZ() + "\"\n\n";
+                person.getLocation().getY() + "\", z = \"" + person.getLocation().getZ() + "\"\n";
+        s += "Created by: " + person.getUsername() + "\n\n";
         return s;
     }
 
@@ -228,6 +245,22 @@ public class CollectionManager {
         }
     }
 
+    private boolean isOwner(String username, int id) throws SQLException {
+        int userId = getUserId(username);
+
+        PreparedStatement statement = connection.prepareStatement(
+                "SELECT * FROM collection WHERE user_id = ? AND id = ?;"
+        );
+
+        statement.setInt(1, userId);
+        statement.setInt(2, id);
+        ResultSet rs = statement.executeQuery();
+
+        if (rs.isBeforeFirst())
+            return true;
+        return false;
+    }
+
     /**
      * Method for executing "update" user command.
      * @see commands.UpdateId
@@ -244,6 +277,12 @@ public class CollectionManager {
                 s += ANSI_RED + "\nTry again\n" + ANSI_RESET;
                 return s;
             }
+            else if (!isOwner(username, (int) person.getId())) {
+                String s = ANSI_RED + "\nYou can edit only your own records!" + ANSI_RESET;
+                s += ANSI_RED + "\nTry again.\n" + ANSI_RESET;
+                return s;
+            }
+
             updatePersonQuery(person);
             loadCollection();
             defaultSort();
@@ -305,6 +344,12 @@ public class CollectionManager {
         }
 
         try {
+            if (!isOwner(username, id)) {
+                String s = ANSI_RED + "\nYou can edit only your own records!" + ANSI_RESET;
+                s += ANSI_RED + "\nTry again.\n" + ANSI_RESET;
+                return s;
+            }
+
             PreparedStatement statement = connection.prepareStatement(
                     "DELETE FROM collection WHERE id = ?;"
             );
@@ -317,6 +362,7 @@ public class CollectionManager {
                 s += ANSI_RED + "Try again.\n" + ANSI_RESET;
                 return s;
             }
+
             loadCollection();
             defaultSort();
             return ANSI_GREEN + "\nPerson with id = " + id + " was successfully removed!\n" + ANSI_RESET;
@@ -337,10 +383,14 @@ public class CollectionManager {
         }
 
         try {
-            Statement statement = connection.createStatement();
-            statement.execute("TRUNCATE TABLE collection RESTART IDENTITY");
+            PreparedStatement statement = connection.prepareStatement(
+                    "DELETE FROM collection WHERE user_id = ?;"
+            );
+            statement.setInt(1, getUserId(username));
+
+            statement.execute();
             loadCollection();
-            return ANSI_GREEN + "\nCollection was successfully cleared.\n" + ANSI_RESET;
+            return ANSI_GREEN + "\nAll your own records successfully cleared.\n" + ANSI_RESET;
         }
         catch (SQLException e) {
             LOGGER.warn("Error with database.");
@@ -383,14 +433,14 @@ public class CollectionManager {
             PreparedStatement statement = connection.prepareStatement("DELETE FROM collection WHERE id = ?;");
 
             for (Person toCompare: collection){
-                if (comparator.compare(person, toCompare) < 0) {
+                if (comparator.compare(person, toCompare) < 0 && toCompare.getUsername().equals(username)) {
                     statement.setInt(1, (int) toCompare.getId());
                     statement.execute();
                 }
             }
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "\nPersons have been successfully removed!\n" + ANSI_RESET;
+            return ANSI_GREEN + "\nYour own records have been successfully removed!\n" + ANSI_RESET;
         }
         catch (SQLException e){
             LOGGER.warn("Error with database.");
@@ -410,14 +460,15 @@ public class CollectionManager {
 
         try {
             PreparedStatement statement = connection.prepareStatement(
-                    "DELETE FROM collection WHERE nationality = ?;");
+                    "DELETE FROM collection WHERE nationality = ? AND user_id = ?;");
 
             int nationalityInd = getCountryKeyFromTable(nationality.toString());
             statement.setInt(1, nationalityInd);
+            statement.setInt(2, getUserId(username));
             statement.execute();
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "\nPersons have been successfully removed!\n" + ANSI_RESET;
+            return ANSI_GREEN + "\nYour own records have been successfully removed!\n" + ANSI_RESET;
         }
         catch (SQLException e) {
             LOGGER.warn("Error with database.");
@@ -510,5 +561,13 @@ public class CollectionManager {
 
     public void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

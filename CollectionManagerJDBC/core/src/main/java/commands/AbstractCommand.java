@@ -13,11 +13,8 @@ public abstract class AbstractCommand implements Serializable {
     private String argument;
     private Object object;
 
-    private boolean is_runnable = true;
-
-    protected final String GREEN_BOLD = "\033[1;32m";
-    protected final String ANSI_RED = "\u001B[31m";
-    protected final String ANSI_RESET = "\u001B[0m";
+    private String username;
+    private String password;
 
     /**
      * Main constructor that accept a collection manager object

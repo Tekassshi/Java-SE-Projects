@@ -1,5 +1,7 @@
 package util;
 
+import commands.AuthorizationCommand;
+import connection.ClientRequest;
 import connection.ServerResponse;
 import interfaces.Command;
 import connection.SerializationManager;
@@ -74,10 +76,11 @@ public class ConnectionManager {
         }
     }
 
-    public boolean sendRequest(Command command) {
-        System.out.println();
-
-        ByteBuffer bb = ByteBuffer.wrap(SerializationManager.serialize(command));
+    public boolean sendRequest(String user, String pass, Command command) {
+        ClientRequest request = new ClientRequest(command);
+        request.setUsername(user);
+        request.setPassword(pass);
+        ByteBuffer bb = ByteBuffer.wrap(SerializationManager.serialize(request));
 
         while (true){
             try {
@@ -132,6 +135,33 @@ public class ConnectionManager {
                 }
             }
         }
+    }
+
+    public boolean readAuthorizationResponse() {
+        ByteBuffer bb = ByteBuffer.allocate(10000);
+
+        while (true) {
+            try {
+                sc.read(bb);
+                ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
+                AuthorizationCommand responseObj = (AuthorizationCommand) response.getObj();
+
+                if (responseObj.getResult() == false)
+                    return false;
+                return true;
+            }
+            catch (ClassNotFoundException | IOException e){
+                if (!tryConnect())
+                    return false;
+
+                System.out.println(ANSI_RED + "\nError while reading authorization result. Try again.\n");
+                return false;
+            }
+        }
+    }
+
+    public Selector getSelector() {
+        return selector;
     }
 
     public static void setIsFirstPackage(boolean isFirstPackage) {

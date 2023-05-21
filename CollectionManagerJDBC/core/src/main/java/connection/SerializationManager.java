@@ -16,10 +16,16 @@ public class SerializationManager {
     }
 
     public static Object deserialize(byte[] arr) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream bais = new ByteArrayInputStream(arr);
-        ObjectInputStream ois = new ObjectInputStream(bais);
+        try {
+            ByteArrayInputStream bais = new ByteArrayInputStream(arr);
+            ObjectInputStream ois = new ObjectInputStream(bais);
 
-        return ois.readObject();
+            return ois.readObject();
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public static boolean isEmpty(byte[] arr){

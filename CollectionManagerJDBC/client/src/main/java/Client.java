@@ -5,6 +5,7 @@ import interfaces.Command;
 import managers.InputManager;
 import readers.ConsoleReader;
 import readers.ScriptReader;
+import util.AuthorizationManager;
 import util.ConnectionManager;
 
 import java.io.*;
@@ -22,21 +23,23 @@ public class Client {
 
     private static boolean isRequestProcessed = true;
     private static Queue<Command> commandQueue = new LinkedList<>();
+    private static AuthorizationManager authorizationManager;
 
     public static void main(String[] args) throws IOException {
-
-        System.out.println(GREEN_BOLD + "\n--- Welcome to collection manager! ---\n" + ANSI_RESET);
 
         Selector selector = Selector.open();
         SocketChannel sc = SocketChannel.open();
 
+        System.out.println(GREEN_BOLD + "\n--- Welcome to collection manager! ---\n" + ANSI_RESET);
         ConnectionManager connectionManager = new ConnectionManager(selector, sc, InputManager.readPort());
         boolean connectionStatus = connectionManager.tryConnect();
         if (!connectionStatus)
             return;
 
-        System.out.println("\n(type \"help\" - to get reference, \"exit\" - to terminate)\n");
-
+        authorizationManager = new AuthorizationManager(connectionManager);
+        authorizationManager.processAuthorization();
+        System.out.println(GREEN_BOLD + "\nAuthorization successful!\n" + ANSI_RESET);
+        System.out.println("(type \"help\" - to get reference, \"exit\" - to terminate)\n");
         CommandFactory.setCollectionManager(null);
 
         while (true) {
@@ -97,7 +100,9 @@ public class Client {
                 return false;
             }
 
-            boolean status = connectionManager.sendRequest((Command) command);
+            boolean status = connectionManager.sendRequest(authorizationManager.getUsername(),
+                    authorizationManager.getPassword(), (Command) command);
+
             if (!status)
                 return true;
 

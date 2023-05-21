@@ -26,6 +26,7 @@ public class Person implements Serializable {
     private Country nationality;
     private Location location;
 
+    private String username;
     /**
      * Builder design pattern for Person class.
      * */
@@ -78,6 +79,11 @@ public class Person implements Serializable {
 
         public Builder location(Location location){
             person.location = location;
+            return this;
+        }
+
+        public Builder username(String username){
+            person.username = username;
             return this;
         }
 
@@ -219,5 +225,13 @@ public class Person implements Serializable {
      * */
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

@@ -6,7 +6,9 @@ import data.Country;
 import data.Location;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.InputMismatchException;
+import java.util.List;
 
 /**
  * Class that contains only static methods to validate user input.
@@ -37,6 +39,80 @@ public class InputManager {
             }
         }
     }
+
+    public static int readAuthType() {
+        while (true) {
+            try {
+                System.out.print("Enter \"1\" - to log in, \"2\" - to sign up: ");
+                String input = reader.readLine();
+                int res = Integer.parseInt(input);
+
+                if (res == 1 || res == 2)
+                    return res;
+                else
+                    throw new IllegalArgumentException();
+            }
+            catch (IOException | IllegalArgumentException e){
+                System.out.println(ANSI_RED + "\nWrong input value! Try again.\n" + ANSI_RESET);
+            }
+        }
+    }
+
+    public static String readUsername(){
+        while (true) {
+            try {
+                System.out.print("\nEnter username: ");
+                String username = reader.readLine();
+                if (!isAuthWord(username))
+                    throw new IllegalArgumentException();
+                return username;
+            }
+            catch (IOException | IllegalArgumentException e){
+                System.out.println(ANSI_RED + "\nWrong username value! Max - 15 symbols and it should contains only " +
+                        "english letters or digits.\n" + ANSI_RESET);
+            }
+        }
+    }
+
+    public static String readPassword(){
+        while (true) {
+            try {
+                Console console = System.console();
+                System.out.print("Enter password: ");
+
+                char[] chars;
+                String password;
+                try {
+                    chars = console.readPassword();
+                    password = new String(chars);
+                }
+                catch (NullPointerException e) {
+                    password = reader.readLine();
+                }
+
+                if (!isAuthWord(password))
+                    throw new IllegalArgumentException();
+                return password;
+            }
+            catch (IllegalArgumentException | IOException e){
+                System.out.println(ANSI_RED + "\nWrong password value! Max - 15 symbols and it should contains only " +
+                        "english letters or digits.\n" + ANSI_RESET);
+            }
+        }
+    }
+
+    public static boolean isAuthWord(String s){
+        if (s.length() > 15)
+            return false;
+        for (int i = 0; i < s.length(); i++){
+            if ((s.charAt(i) < 'A' || s.charAt(i) > 'Z') &&
+                    (s.charAt(i) < 'a' || s.charAt(i) > 'z') &&
+                    (s.charAt(i) < '0' || s.charAt(i) > '9'))
+                return false;
+        }
+        return true;
+    }
+
     /**
      * Utility method for reading "name" field value from default input stream.
      * @return valid "name" field String value.

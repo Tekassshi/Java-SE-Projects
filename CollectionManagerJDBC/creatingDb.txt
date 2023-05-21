@@ -33,9 +33,16 @@ create table Collection (
     nationality int references country,
     location_x int,
     location_y real,
-    location_z double precision
+    location_z double precision,
+    user_id int references users
 );
 
+create table users (
+    id serial primary key,
+    username text unique,
+    password_hash text,
+    salt text
+);
 
 insert into collection (name, coord_x, coord_y, creation_date, height, weight, eye_color, nationality, location_x, location_y, location_z)
 values ('Ярик', 123, 234234, CURRENT_TIMESTAMP, 123, 1234.4321, 3, 2, 423, 534.2, 234.23443),

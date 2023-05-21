@@ -26,7 +26,8 @@ public class Server {
 
             ConnectionManager connectionManager = new ConnectionManager(logger);
 
-            RequestProcessor requestProcessor = new RequestProcessor(connectionManager, collectionManager, logger);
+            RequestProcessor requestProcessor = new RequestProcessor(connectionManager, collectionManager,
+                    dbManager, logger);
             requestProcessor.addLongRepCommands("Show", "FilterByNationality", "PrintFieldDescendingHeight");
 
             requestProcessor.run();
