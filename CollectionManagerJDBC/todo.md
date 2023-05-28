@@ -1,1 +1,2 @@
-server crash if client crash while authorization
+jwt tokens
+true multithreading

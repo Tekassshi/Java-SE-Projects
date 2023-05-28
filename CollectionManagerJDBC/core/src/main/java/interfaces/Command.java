@@ -9,5 +9,5 @@ public interface Command {
      * Method to executing current command using CollectionManager object and Person built object.
      * @see CollectionManager
      * */
-    String execute() throws IOException;
+    String execute(String username) throws IOException;
 }

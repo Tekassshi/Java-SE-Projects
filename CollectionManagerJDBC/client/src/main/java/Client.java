@@ -31,14 +31,16 @@ public class Client {
         SocketChannel sc = SocketChannel.open();
 
         System.out.println(GREEN_BOLD + "\n--- Welcome to collection manager! ---\n" + ANSI_RESET);
-        ConnectionManager connectionManager = new ConnectionManager(selector, sc, InputManager.readPort());
+        int port = InputManager.readPort();
+        ConnectionManager connectionManager = new ConnectionManager(selector, sc, port);
         boolean connectionStatus = connectionManager.tryConnect();
         if (!connectionStatus)
             return;
 
         authorizationManager = new AuthorizationManager(connectionManager);
+        connectionManager.setAuthorizationManager(authorizationManager);
         authorizationManager.processAuthorization();
-        System.out.println(GREEN_BOLD + "\nAuthorization successful!\n" + ANSI_RESET);
+
         System.out.println("(type \"help\" - to get reference, \"exit\" - to terminate)\n");
         CommandFactory.setCollectionManager(null);
 
@@ -89,7 +91,7 @@ public class Client {
             if (command instanceof String && command.equals("exit"))
                 return true;
             else if (command instanceof Help) {
-                String s = ((Command) command).execute();
+                String s = ((Command) command).execute(null);
                 System.out.println(s);
                 return false;
             } else if (command instanceof ExecuteScript) {
@@ -100,8 +102,7 @@ public class Client {
                 return false;
             }
 
-            boolean status = connectionManager.sendRequest(authorizationManager.getUsername(),
-                    authorizationManager.getPassword(), (Command) command);
+            boolean status = connectionManager.sendRequest((Command) command, authorizationManager.getToken());
 
             if (!status)
                 return true;
@@ -111,5 +112,3 @@ public class Client {
         return false;
     }
 }
-//builder
-//поведенческий

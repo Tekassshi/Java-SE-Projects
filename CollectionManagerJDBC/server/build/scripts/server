@@ -111,7 +111,7 @@ case "$( uname )" in                #(
   NONSTOP* )        nonstop=true ;;
 esac
 
-CLASSPATH=$APP_HOME/lib/server-1.0.jar:$APP_HOME/lib/core-0.2.jar:$APP_HOME/lib/logback-classic-1.2.3.jar:$APP_HOME/lib/logback-core-1.2.3.jar:$APP_HOME/lib/jackson-module-parameter-names-2.14.2.jar:$APP_HOME/lib/jackson-datatype-jsr310-2.14.2.jar:$APP_HOME/lib/jackson-datatype-jdk8-2.14.2.jar:$APP_HOME/lib/jackson-module-jaxb-annotations-2.14.2.jar:$APP_HOME/lib/jackson-annotations-2.14.2.jar:$APP_HOME/lib/jackson-dataformat-xml-2.14.2.jar:$APP_HOME/lib/jackson-databind-2.14.2.jar:$APP_HOME/lib/jackson-core-2.14.2.jar:$APP_HOME/lib/slf4j-api-1.7.25.jar:$APP_HOME/lib/woodstox-core-6.5.0.jar:$APP_HOME/lib/stax2-api-4.2.1.jar:$APP_HOME/lib/jakarta.xml.bind-api-2.3.3.jar:$APP_HOME/lib/jakarta.activation-api-1.2.2.jar
+CLASSPATH=$APP_HOME/lib/server-1.0.jar:$APP_HOME/lib/core-0.2.jar:$APP_HOME/lib/postgresql-42.6.0.jar:$APP_HOME/lib/commons-lang3-3.12.0.jar:$APP_HOME/lib/commons-codec-1.15.jar:$APP_HOME/lib/java-jwt-4.4.0.jar:$APP_HOME/lib/logback-classic-1.2.3.jar:$APP_HOME/lib/logback-core-1.2.3.jar:$APP_HOME/lib/jackson-annotations-2.15.0.jar:$APP_HOME/lib/jackson-core-2.15.0.jar:$APP_HOME/lib/jackson-databind-2.15.0.jar:$APP_HOME/lib/checker-qual-3.31.0.jar:$APP_HOME/lib/slf4j-api-1.7.25.jar:$APP_HOME/lib/fastdoubleparser-0.8.0.jar
 
 
 # Determine the Java command to use to start the JVM.
@@ -206,7 +206,7 @@ DEFAULT_JVM_OPTS=""
 
 set -- \
         -classpath "$CLASSPATH" \
-        Server \
+        Main \
         "$@"
 
 # Stop when "xargs" is not available.

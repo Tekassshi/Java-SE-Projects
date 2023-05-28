@@ -6,6 +6,8 @@ public abstract class AuthorizationCommand implements Serializable {
     private String username;
     private String password;
 
+    private String token;
+
     private boolean result = false;
 
     public AuthorizationCommand(String username, String password){
@@ -27,5 +29,13 @@ public abstract class AuthorizationCommand implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

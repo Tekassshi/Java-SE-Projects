@@ -20,7 +20,7 @@ public class PrintFieldDescendingHeight extends AbstractCommand implements Comma
     }
 
     @Override
-    public String execute() throws IOException {
+    public String execute(String username) throws IOException {
         return super.getCollectionManager().printFieldDescendingHeight();
     }
 }

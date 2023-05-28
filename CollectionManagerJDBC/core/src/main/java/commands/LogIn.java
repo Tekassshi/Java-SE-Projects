@@ -10,7 +10,7 @@ public class LogIn extends AuthorizationCommand implements Command {
     }
 
     @Override
-    public String execute() throws IOException {
+    public String execute(String username) throws IOException {
         return null;
     }
 }

@@ -60,7 +60,7 @@ public class RemoveGreater extends AbstractCommand implements Command, Assemblab
 
 
     @Override
-    public String execute() {
-        return super.getCollectionManager().removeGreater((Person) super.getObject());
+    public String execute(String username) {
+        return super.getCollectionManager().removeGreater(username, (Person) super.getObject());
     }
 }

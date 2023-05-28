@@ -70,7 +70,7 @@ public class UpdateId extends AbstractCommand implements CommandWithArg, Assembl
     }
 
     @Override
-    public String execute() {
-        return super.getCollectionManager().updateId((Person) super.getObject());
+    public String execute(String username) {
+        return super.getCollectionManager().updateId(username, (Person) super.getObject());
     }
 }

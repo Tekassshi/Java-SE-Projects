@@ -17,7 +17,7 @@ public class Show extends AbstractCommand implements Command {
     }
 
     @Override
-    public String execute() {
+    public String execute(String username) {
         return super.getCollectionManager().show();
     }
 }

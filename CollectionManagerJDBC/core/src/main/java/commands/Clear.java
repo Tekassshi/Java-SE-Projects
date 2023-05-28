@@ -16,7 +16,7 @@ public class Clear extends AbstractCommand implements Command {
     }
 
     @Override
-    public String execute() {
-        return super.getCollectionManager().clear();
+    public String execute(String username) {
+        return super.getCollectionManager().clear(username);
     }
 }

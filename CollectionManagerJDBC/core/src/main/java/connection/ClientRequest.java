@@ -3,8 +3,8 @@ package connection;
 import java.io.Serializable;
 
 public class ClientRequest implements Serializable {
-    private String username;
-    private String password;
+    private String token;
+
     private Object obj;
 
     public ClientRequest(Object obj) {
@@ -15,19 +15,11 @@ public class ClientRequest implements Serializable {
         return obj;
     }
 
-    public String getUsername() {
-        return username;
+    public String getToken() {
+        return token;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

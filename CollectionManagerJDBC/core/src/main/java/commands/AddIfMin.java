@@ -25,8 +25,8 @@ public class AddIfMin extends AbstractCommand implements Command, AssemblableCom
     }
 
     @Override
-    public String execute() {
-        return super.getCollectionManager().addIfMin((Person) super.getObject());
+    public String execute(String username) {
+        return super.getCollectionManager().addIfMin(username, (Person) super.getObject());
     }
 
     @Override

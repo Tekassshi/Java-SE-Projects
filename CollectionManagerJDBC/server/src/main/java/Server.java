@@ -1,52 +1,83 @@
+import abstractions.ServerTemplate;
+import concurrency.AuthenticationExecutor;
+import concurrency.ThreadPoolFactory;
 import managers.CollectionManager;
-import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import util.ConnectionManager;
 import util.DatabaseManager;
-import util.RequestProcessor;
 
 import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 
-public class Server {
-    private static org.slf4j.Logger logger = LoggerFactory.getLogger(Server.class);
+import static managers.CollectionManager.ANSI_GREEN;
+import static managers.CollectionManager.ANSI_RESET;
 
-    public static void main(String[] args) throws SQLException {
+public class Server extends ServerTemplate {
+    private DatabaseManager dbManager;
+    private CollectionManager collectionManager;
+    private ConnectionManager connectionManager;
+    private ServerSocket serverSocket;
+    private Logger logger;
 
-        logger.info("Server started\n");
-        DatabaseManager dbManager = new DatabaseManager();
+    @Override
+    public void configureLogger(Logger logger) {
+        this.logger = logger;
+    }
 
-        try {
-            dbManager.setConnection("localhost", 5432, ".credentials");
-            dbManager.checkDatabase();
-            logger.info("Connection with database was successfully established.");
+    @Override
+    public void configureDatabase() throws SQLException, IOException {
+        dbManager = new DatabaseManager();
 
-            CollectionManager collectionManager = new CollectionManager(dbManager.getConnection(), logger);
-            collectionManager.loadCollection();
-            logger.info("Collection was successfully loaded from database.");
+        // dbManager.setConnection("localhost", 5432, ".credentials");
+        dbManager.setConnection(".credentials");
 
-            ConnectionManager connectionManager = new ConnectionManager(logger);
+        dbManager.checkDatabase();
+        logger.info("Connection with database was successfully established.");
+    }
 
-            RequestProcessor requestProcessor = new RequestProcessor(connectionManager, collectionManager,
-                    dbManager, logger);
-            requestProcessor.addLongRepCommands("Show", "FilterByNationality", "PrintFieldDescendingHeight");
+    @Override
+    public void configureCollectionManager() throws SQLException {
+        collectionManager = new CollectionManager(dbManager.getConnection(), logger);
+        collectionManager.loadCollection();
+        logger.info("Collection was successfully loaded from database.");
+    }
 
-            requestProcessor.run();
+    @Override
+    public void configureConnection() throws SocketException {
+        connectionManager = new ConnectionManager(logger);
+
+        serverSocket = connectionManager.getSocket();
+        if (serverSocket == null)
+            throw new SocketException();
+    }
+
+    @Override
+    public void run() throws IOException {
+        ExecutorService fixedThreadPool = ThreadPoolFactory.getFixedThreadPool();
+
+        logger.info("Request processor was started successfully.\n");
+        System.out.println("Server is currently running on port: " + ANSI_GREEN + serverSocket.getLocalPort()
+                + ANSI_RESET + "\n");
+
+        while (true) {
+            Socket client = serverSocket.accept();
+
+            logger.info("Accepted new connection \"" + client.getLocalAddress() + "\"");
+            AuthenticationExecutor authenticationTask =
+                    new AuthenticationExecutor(client, collectionManager, dbManager);
+            fixedThreadPool.submit(authenticationTask);
         }
-        catch (IllegalArgumentException e){
-            logger.error("Error reading database. Check data for compatibility with current app version. " +
-                    "Server stopped.");
-            dbManager.closeConnection();
-        }
-        catch (InterruptedException e){
-            logger.error("Request processor error. Server stopped.\n");
-            dbManager.closeConnection();
-        }
-        catch (SQLException e) {
-            logger.error("Error access to database. Check \".credentials\" file \nor make sure " +
-                    "the database is running. Server stopped.\n");
-        }
-        catch (IOException e){
-            logger.error("Error reading \".credentials\" file or it's doesn't exist. Server stopped.\n");
-        }
+    }
+
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public DatabaseManager getDbManager() {
+        return dbManager;
     }
 }

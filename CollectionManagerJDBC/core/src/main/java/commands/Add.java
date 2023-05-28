@@ -63,7 +63,7 @@ public class Add extends AbstractCommand implements Command, AssemblableCommand 
      * @see Person
      * */
     @Override
-    public String execute() throws IOException {
-        return super.getCollectionManager().add((Person) super.getObject());
+    public String execute(String username) throws IOException {
+        return super.getCollectionManager().add(username, (Person) super.getObject());
     }
 }

@@ -31,7 +31,7 @@ public class RemoveAllByNationality extends AbstractCommand implements CommandWi
     }
 
     @Override
-    public String execute() throws IOException {
-        return super.getCollectionManager().removeAllByNationality(Country.valueOf(super.getArgument()));
+    public String execute(String username) throws IOException {
+        return super.getCollectionManager().removeAllByNationality(username, Country.valueOf(super.getArgument()));
     }
 }

@@ -28,7 +28,7 @@ public class FilterByNationality extends AbstractCommand implements CommandWithA
     }
 
     @Override
-    public String execute() {
-        return super.getCollectionManager().filterByNationality(Country.valueOf(super.getArgument()));
+    public String execute(String username) {
+        return super.getCollectionManager().filterByNationality(username, Country.valueOf(super.getArgument()));
     }
 }

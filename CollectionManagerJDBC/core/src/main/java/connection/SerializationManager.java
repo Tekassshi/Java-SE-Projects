@@ -3,7 +3,7 @@ package connection;
 import java.io.*;
 
 public class SerializationManager {
-    public static byte[] serialize(Object obj){
+    public synchronized static byte[] serialize(Object obj){
         try(ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos)) {
 
@@ -15,20 +15,14 @@ public class SerializationManager {
         }
     }
 
-    public static Object deserialize(byte[] arr) throws IOException, ClassNotFoundException {
-        try {
-            ByteArrayInputStream bais = new ByteArrayInputStream(arr);
-            ObjectInputStream ois = new ObjectInputStream(bais);
+    public synchronized static Object deserialize(byte[] arr) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream bais = new ByteArrayInputStream(arr);
+        ObjectInputStream ois = new ObjectInputStream(bais);
 
-            return ois.readObject();
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
+        return ois.readObject();
     }
 
-    public static boolean isEmpty(byte[] arr){
+    public synchronized static boolean isEmpty(byte[] arr){
         for (byte n : arr)
             if (n != 0)
                 return false;

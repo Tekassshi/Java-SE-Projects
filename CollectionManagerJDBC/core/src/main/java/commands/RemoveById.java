@@ -27,7 +27,7 @@ public class RemoveById extends AbstractCommand implements CommandWithArg {
     }
 
     @Override
-    public String execute() {
-        return super.getCollectionManager().removeById(Integer.parseInt(super.getArgument()));
+    public String execute(String username) {
+        return super.getCollectionManager().removeById(username, Integer.parseInt(super.getArgument()));
     }
 }

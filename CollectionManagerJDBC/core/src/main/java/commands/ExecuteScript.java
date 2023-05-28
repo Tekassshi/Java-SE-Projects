@@ -33,7 +33,7 @@ public class ExecuteScript extends AbstractCommand implements CommandWithArg {
      * @throws IOException if file path is incorrect.
      * */
     @Override
-    public String execute() {
+    public String execute(String username) {
         return null;
     }
 }

@@ -7,8 +7,8 @@ import managers.CollectionManager;
  * Class for "help" command. Command outputs reference for all available commands.
  * */
 public class Help extends AbstractCommand implements Command {
-
     /**
+     *
      * Main constructor that using parent AbstractCommand constructor.
      * @see AbstractCommand
      * */
@@ -17,7 +17,7 @@ public class Help extends AbstractCommand implements Command {
     }
 
     @Override
-    public String execute() {
+    public String execute(String username) {
         StringBuilder s = new StringBuilder("");
         s.append("\n--- Reference for all commands ---\n");
         s.append(

@@ -13,9 +13,6 @@ public abstract class AbstractCommand implements Serializable {
     private String argument;
     private Object object;
 
-    private String username;
-    private String password;
-
     /**
      * Main constructor that accept a collection manager object
      * @param collectionManager object of CollectionManager to execute command.

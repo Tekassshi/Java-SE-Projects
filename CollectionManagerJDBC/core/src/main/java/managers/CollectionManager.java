@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -19,14 +20,13 @@ import org.slf4j.Logger;
  * @see UserCollection
  * */
 public class CollectionManager {
-    private Deque<Person> collection = new ArrayDeque<>();
+    private Deque<Person> collection = new LinkedBlockingDeque<>();
     private Connection connection;
 
     public static final String ANSI_GREEN = "\u001B[32m";
     public static final String ANSI_RED = "\u001B[31m";
     public static final String ANSI_RESET = "\u001B[0m";
 
-    private String username;
     private Logger LOGGER;
 
     public CollectionManager(Connection connection, Logger logger){
@@ -34,7 +34,7 @@ public class CollectionManager {
         this.LOGGER = logger;
     }
 
-    private Person getPersonFromRow(ResultSet rs) throws SQLException {
+    private synchronized Person getPersonFromRow(ResultSet rs) throws SQLException {
         int id = rs.getInt("id");
         String name = rs.getString("name");
         long coord_x = rs.getLong("coord_x");
@@ -73,7 +73,7 @@ public class CollectionManager {
         return person;
     }
 
-    private ArrayDeque<Person> getResultSetData(ResultSet rs) throws SQLException, IllegalArgumentException {
+    private synchronized ArrayDeque<Person> getResultSetData(ResultSet rs) throws SQLException, IllegalArgumentException {
         ArrayDeque<Person> result = new ArrayDeque<>();
 
         while (rs.next()) {
@@ -83,7 +83,7 @@ public class CollectionManager {
         return result;
     }
 
-    private ResultSet getCompleteDataFromDb() throws SQLException {
+    private synchronized ResultSet getCompleteDataFromDb() throws SQLException {
         Statement statement = connection.createStatement();
         ResultSet set = statement.executeQuery(
                 "SELECT * FROM " +
@@ -94,13 +94,13 @@ public class CollectionManager {
         return set;
     }
 
-    public void loadCollection() throws SQLException {
+    public synchronized void loadCollection() throws SQLException {
         collection = getResultSetData(getCompleteDataFromDb());
         defaultSort();
-        LOGGER.info("Collection was loaded successfully");
+        LOGGER.info("Collection data was updated successfully");
     }
 
-    private int getUserId(String username) throws SQLException {
+    public synchronized int getUserId(String username) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "SELECT id FROM users WHERE username = ?;"
         );
@@ -110,7 +110,7 @@ public class CollectionManager {
         return set.getInt("id");
     }
 
-    private int getColorKeyFromTable(String color) throws SQLException {
+    private synchronized int getColorKeyFromTable(String color) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "SELECT color_id FROM color WHERE color_name = ?;");
 
@@ -120,7 +120,7 @@ public class CollectionManager {
         return rs.getInt(1);
     }
 
-    private int getCountryKeyFromTable(String country) throws SQLException {
+    private synchronized int getCountryKeyFromTable(String country) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "SELECT country_id FROM country WHERE country_name = ?;");
 
@@ -130,7 +130,7 @@ public class CollectionManager {
         return rs.getInt(1);
     }
 
-    private void insertPersonQuery(Person person) throws SQLException{
+    private synchronized void insertPersonQuery(String username, Person person) throws SQLException{
         PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO collection(name, coord_x, coord_y, creation_date, height, weight, eye_color, " +
                         "nationality, location_x, location_y, location_z, user_id)" +
@@ -163,7 +163,7 @@ public class CollectionManager {
      * Method for executing "show" user command.
      * @see commands.Show
      * */
-    public String show() {
+    public synchronized String show() {
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -179,7 +179,7 @@ public class CollectionManager {
      * Method is used to output given "Person" object to stream.
      * @see Person
      * */
-    public String showPerson(Person person){
+    public synchronized String showPerson(Person person){
         String s = "";
         s += "Id: " + person.getId() + "\n";
         s += "Name: " + person.getName() + "\n";
@@ -201,9 +201,9 @@ public class CollectionManager {
      * @see commands.Add
      * @param person "Person" class object to add to current collection.
      * */
-    public String add(Person person) {
+    public synchronized String add(String username, Person person) {
         try {
-            insertPersonQuery(person);
+            insertPersonQuery(username, person);
             loadCollection();
             defaultSort();
             return ANSI_GREEN + "Person was added successfully!\n" + ANSI_RESET;
@@ -219,7 +219,7 @@ public class CollectionManager {
      * @see commands.AddIfMin
      * @param person "Person" class object to add to current collection.
      * */
-    public String addIfMin(Person person) {
+    public synchronized String addIfMin(String username, Person person) {
 
         Person toCompare = collection.peekFirst();
         DefaultComparator defaultComparator = new DefaultComparator();
@@ -234,7 +234,7 @@ public class CollectionManager {
         }
 
         try {
-            insertPersonQuery(person);
+            insertPersonQuery(username, person);
             loadCollection();
             defaultSort();
             return ANSI_GREEN + "Person was added successfully!\n" + ANSI_RESET;
@@ -245,7 +245,7 @@ public class CollectionManager {
         }
     }
 
-    private boolean isOwner(String username, int id) throws SQLException {
+    private synchronized boolean isOwner(String username, int id) throws SQLException {
         int userId = getUserId(username);
 
         PreparedStatement statement = connection.prepareStatement(
@@ -266,7 +266,7 @@ public class CollectionManager {
      * @see commands.UpdateId
      * @param person "Person" class object for updating in node with same "id" field in current collection.
      * */
-    public String updateId(Person person) {
+    public synchronized String updateId(String username, Person person) {
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -294,7 +294,7 @@ public class CollectionManager {
         }
     }
 
-    private void updatePersonQuery(Person person) throws SQLException {
+    private synchronized void updatePersonQuery(Person person) throws SQLException {
         PreparedStatement statement = connection.prepareStatement(
                 "UPDATE collection SET " +
                         "name = ?," +
@@ -338,7 +338,7 @@ public class CollectionManager {
      * @see commands.RemoveById
      * @param id node "id" field value that we should remove from current collection.
      * */
-    public String removeById(int id) {
+    public synchronized String removeById(String username, int id) {
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -377,7 +377,7 @@ public class CollectionManager {
      * Method for executing "clear" user command.
      * @see commands.Clear
      * */
-    public String clear() {
+    public synchronized String clear(String username) {
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -402,7 +402,7 @@ public class CollectionManager {
      * Method for sorting current collection using "DefaultComparator" comparator class.
      * @see DefaultComparator
      * */
-    private void defaultSort(){
+    private synchronized void defaultSort(){
         collection = collection.stream().sorted(new DefaultComparator())
                 .collect(Collectors.toCollection(ArrayDeque::new));
     }
@@ -411,7 +411,7 @@ public class CollectionManager {
      * Method for executing "head" user command.
      * @see commands.Head
      * */
-    public String head(){
+    public synchronized String head(){
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -423,7 +423,7 @@ public class CollectionManager {
      * @see commands.RemoveGreater
      * @param person "Person" class object after which we should remove all nodes.
      * */
-    public String removeGreater(Person person) {
+    public synchronized String removeGreater(String username, Person person) {
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -453,7 +453,7 @@ public class CollectionManager {
      * @see commands.RemoveAllByNationality
      * @param nationality "Country" class object with which we should remove all nodes in current collection.
      * */
-    public String removeAllByNationality(Country nationality){
+    public synchronized String removeAllByNationality(String username, Country nationality){
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -481,7 +481,7 @@ public class CollectionManager {
      * @see FilterByNationality
      * @param nationality "Country" class object with which we should output all nodes in current collection.
      * */
-    public String filterByNationality(Country nationality){
+    public synchronized String filterByNationality(String username, Country nationality){
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -496,7 +496,7 @@ public class CollectionManager {
      * Method for executing "print_field_descending_height" user command.
      * @see commands.PrintFieldDescendingHeight
      * */
-    public String printFieldDescendingHeight(){
+    public synchronized String printFieldDescendingHeight(){
         if (collection.size() == 0) {
             return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
         }
@@ -513,7 +513,7 @@ public class CollectionManager {
     /** Utility method for checking given id on existence in current collection.
      * @param id "id" field value to checking.
      * */
-    public boolean isIdExist(Integer id) throws SQLException{
+    public synchronized boolean isIdExist(Integer id) throws SQLException{
        PreparedStatement statement = connection.prepareStatement(
                "SELECT FROM collection where id = ?;");
        statement.setInt(1, id);
@@ -529,7 +529,7 @@ public class CollectionManager {
      * Method for executing "info" user command.
      * @see commands.Info
      * */
-    public String info(){
+    public synchronized String info(){
         String s = "";
         s += ANSI_GREEN + "\n--- Collection info ---\n" + ANSI_RESET;
         s += "Collection type: ArrayDeque<Person>" + "\n";
@@ -537,37 +537,29 @@ public class CollectionManager {
         return s;
     }
 
-    public ArrayList<Person> getFilteredNationalityCollection(Country nationality){
+    public synchronized ArrayList<Person> getFilteredNationalityCollection(Country nationality){
         ArrayList<Person> tmp = new ArrayList<>();
         collection.stream().filter(x -> x.getNationality().equals(nationality)).forEach(x -> tmp.add(x));
 
         return tmp;
     }
 
-    public ArrayList<Person> getDescendingHeightCollection(){
+    public synchronized ArrayList<Person> getDescendingHeightCollection(){
         ArrayList<Person> tmp = new ArrayList<>(collection);
         collection.stream().sorted(new HeightComparator()).forEach(x -> tmp.add(x));
 
         return tmp;
     }
 
-    public long getCollectionSize(){
+    public synchronized long getCollectionSize(){
         return collection.size();
     }
 
-    public ArrayDeque getCollection(){
+    public synchronized ArrayDeque getCollection(){
         return (ArrayDeque) collection;
     }
 
-    public void setConnection(Connection connection) {
+    public synchronized void setConnection(Connection connection) {
         this.connection = connection;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 }

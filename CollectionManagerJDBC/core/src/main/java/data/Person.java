@@ -1,23 +1,17 @@
 package data;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
-
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 /**
  * Person class that contains only state fields. Used for storing it objects in collection.
  * */
-@JacksonXmlRootElement(localName = "customer")
 public class Person implements Serializable {
 
     private long id;
     private String name;
     private Coordinates coordinates;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
     private java.time.ZonedDateTime creationDate;
 
     private Integer height;

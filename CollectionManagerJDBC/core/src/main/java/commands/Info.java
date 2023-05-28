@@ -20,7 +20,7 @@ public class Info extends AbstractCommand implements Command {
     }
 
     @Override
-    public String execute() throws IOException {
+    public String execute(String username) throws IOException {
         return super.getCollectionManager().info();
     }
 }

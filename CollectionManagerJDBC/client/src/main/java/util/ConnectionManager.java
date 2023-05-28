@@ -1,6 +1,8 @@
 package util;
 
 import commands.AuthorizationCommand;
+import commands.LogIn;
+import commands.SignUp;
 import connection.ClientRequest;
 import connection.ServerResponse;
 import interfaces.Command;
@@ -25,6 +27,8 @@ public class ConnectionManager {
     private static boolean isLongReply = false;
     private static long packages = 0;
     private static boolean isFirstPackage = true;
+
+    private AuthorizationManager authorizationManager;
 
     public ConnectionManager(Selector selector, SocketChannel sc, int port){
         this.selector = selector;
@@ -58,8 +62,10 @@ public class ConnectionManager {
                     sc.close();
                     sc = SocketChannel.open();
 
-                    System.out.print("\rTrying connect to server" + dot.repeat(counter));
-                    Thread.sleep(500);
+                    if (System.currentTimeMillis() - start > 5000){
+                        System.out.print("\rTrying connect to the server" + dot.repeat(counter));
+                        Thread.sleep(500);
+                    }
                 }
                 catch (IOException | InterruptedException f) {
                     return false;
@@ -76,10 +82,9 @@ public class ConnectionManager {
         }
     }
 
-    public boolean sendRequest(String user, String pass, Command command) {
+    public boolean sendRequest(Command command, String token) {
         ClientRequest request = new ClientRequest(command);
-        request.setUsername(user);
-        request.setPassword(pass);
+        request.setToken(token);
         ByteBuffer bb = ByteBuffer.wrap(SerializationManager.serialize(request));
 
         while (true){
@@ -90,55 +95,77 @@ public class ConnectionManager {
             catch (Exception e){
                 if (!tryConnect())
                     return false;
+                if (!(command instanceof LogIn || command instanceof SignUp))
+                    authorizationManager.processAuthorization();
             }
         }
     }
 
-    public boolean readResponse() {
-        ByteBuffer bb = ByteBuffer.allocate(10000);
+    public boolean sendAuthRequest(Command command){
+        ClientRequest request = new ClientRequest(command);
 
-        while (true) {
+        ByteBuffer bb = ByteBuffer.wrap(SerializationManager.serialize(request));
+
+        while (true){
             try {
-                sc.read(bb);
-                ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
-                Object responseObj = response.getObj();
-
-                if (responseObj instanceof Integer){
-                    packages = (Integer) responseObj;
-                    isLongReply = true;
-                }
-
-                if (!isLongReply())
-                    System.out.println("Server request:\n" + responseObj.toString());
-                else {
-                    if (!isFirstPackage)
-                        packages--;
-                    if (isFirstPackage) {
-                        System.out.println("Server request:\n");
-                        isFirstPackage = false;
-                    }
-                    System.out.println(responseObj.toString());
-                    if (packages == 0) {
-                        isLongReply = false;
-                    }
-                }
+                sc.write(bb);
                 return true;
             }
             catch (Exception e){
                 if (!tryConnect())
                     return false;
-
-                if (isLongReply) {
-                    isLongReply = false;
-                    System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
-                    return true;
-                }
+                if (!(command instanceof LogIn || command instanceof SignUp))
+                    authorizationManager.processAuthorization();
             }
         }
     }
 
-    public boolean readAuthorizationResponse() {
-        ByteBuffer bb = ByteBuffer.allocate(10000);
+    public boolean readResponse() {
+        ByteBuffer bb = ByteBuffer.allocate(20000);
+
+        try {
+            sc.read(bb);
+            ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
+            Object responseObj = response.getObj();
+            if (responseObj instanceof Integer){
+                packages = (Integer) responseObj;
+                isLongReply = true;
+            }
+            if (!isLongReply())
+                System.out.println("Server request:\n" + responseObj.toString());
+            else {
+                if (!isFirstPackage)
+                    packages--;
+                if (isFirstPackage) {
+                    System.out.println("Server request:\n");
+                    isFirstPackage = false;
+                }
+                System.out.println(responseObj.toString());
+                if (packages == 0) {
+                    isLongReply = false;
+                }
+            }
+            return true;
+        }
+        catch (Exception e){
+            if (!tryConnect())
+                return false;
+
+            authorizationManager.processAuthorization();
+
+            if (isLongReply)
+                isLongReply = false;
+
+            System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
+            return true;
+        }
+    }
+
+    public Object[] readAuthorizationResponse() {
+        ByteBuffer bb = ByteBuffer.allocate(5000);
+
+        Object[] res = new Object[2];
+        res[0] = false;
 
         while (true) {
             try {
@@ -146,16 +173,19 @@ public class ConnectionManager {
                 ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
                 AuthorizationCommand responseObj = (AuthorizationCommand) response.getObj();
 
-                if (responseObj.getResult() == false)
-                    return false;
-                return true;
+                if (responseObj.getResult() == false) {
+                    return res;
+                }
+                res[0] = true;
+                res[1] = responseObj.getToken();
+                return res;
             }
-            catch (ClassNotFoundException | IOException e){
+            catch (ClassNotFoundException | NullPointerException | IOException e){
                 if (!tryConnect())
-                    return false;
+                    return res;
 
                 System.out.println(ANSI_RED + "\nError while reading authorization result. Try again.\n");
-                return false;
+                return res;
             }
         }
     }
@@ -170,5 +200,9 @@ public class ConnectionManager {
 
     public static boolean isLongReply() {
         return isLongReply;
+    }
+
+    public void setAuthorizationManager(AuthorizationManager authorizationManager) {
+        this.authorizationManager = authorizationManager;
     }
 }

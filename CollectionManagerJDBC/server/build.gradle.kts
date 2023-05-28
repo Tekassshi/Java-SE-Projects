@@ -16,7 +16,7 @@ repositories{
 }
 
 application {
-    mainClass.set("Server")
+    mainClass.set("Main")
 }
 
 dependencies {
