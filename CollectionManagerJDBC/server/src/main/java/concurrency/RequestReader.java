@@ -1,6 +1,5 @@
 package concurrency;
 
-import ch.qos.logback.core.pattern.color.ANSIConstants;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -17,7 +16,6 @@ import java.io.InputStream;
 import java.net.Socket;
 import java.sql.SQLException;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeoutException;
 
 public class RequestReader implements Runnable {
     private CollectionManager collectionManager;

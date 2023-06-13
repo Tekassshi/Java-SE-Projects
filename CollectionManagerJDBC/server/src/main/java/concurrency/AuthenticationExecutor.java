@@ -162,9 +162,7 @@ public class AuthenticationExecutor implements Runnable{
         String hashedPassSalt = DigestUtils.md5Hex(password + salt);
         String dbPasswordHash = getPasswordHash(username);
 
-        if (!dbPasswordHash.equals(hashedPassSalt))
-            return false;
-        return true;
+        return dbPasswordHash.equals(hashedPassSalt);
     }
 
     private boolean signUp(String username, String password) throws SQLException {

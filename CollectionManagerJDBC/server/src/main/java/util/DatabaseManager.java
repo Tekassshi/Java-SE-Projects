@@ -49,9 +49,9 @@ public class DatabaseManager {
             throw new SQLException();
         }
 
-//        url = "jdbc:postgresql://" + host + ":" + port + "/";
-        String dbName = "studs";
-        url = "jdbc:postgresql://" + host + ":" + port + "/" + dbName;
+        url = "jdbc:postgresql://" + host + ":" + port + "/";
+//        String dbName = "studs";
+//        url = String.format("jdbc:postgresql://%s:%s/%s", host, port, dbName);
 
         if (user == null || password == null) {
             logger.error("Invalid database user or password.");
