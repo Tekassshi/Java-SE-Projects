@@ -1,0 +1,26 @@
+17:31:56.869 [main] INFO  Server - Checking tables in database for existence.
+17:31:56.887 [main] INFO  Server - Table "color" exists.
+17:31:56.887 [main] INFO  Server - Table "country" exists.
+17:31:56.887 [main] INFO  Server - Table "users" exists.
+17:31:56.887 [main] INFO  Server - Table "collection" exists.
+17:31:56.887 [main] INFO  Server - Connection with database was successfully established.
+17:31:56.899 [main] INFO  Server - Collection data was updated successfully
+17:31:56.899 [main] INFO  Server - Collection was successfully loaded from database.
+17:31:56.899 [main] INFO  Server - Request processor was started successfully.
+
+17:32:12.694 [main] INFO  Server - Accepted new connection "/127.0.0.1"
+17:32:18.719 [auth thread] INFO  Server - Reading authorization data
+17:32:18.750 [auth thread] ERROR Server - Error access to database. Connection refused.
+17:32:18.750 [main] INFO  Server - Accepted new connection "/127.0.0.1"
+17:32:27.785 [auth thread] INFO  Server - Reading authorization data
+17:32:27.957 [tekassh1 sender] INFO  Server - Sending reply to the user
+17:32:27.957 [auth thread] INFO  Server - User "tekassh1" - authentication successful.
+17:32:27.957 [tekassh1 reader] INFO  Server - Reading client request.
+17:32:30.833 [tekassh1 reader] INFO  Server - Reading client request.
+17:32:30.833 [tekassh1 executor] INFO  Server - Executing user "Info" command
+17:32:30.833 [tekassh1 sender] INFO  Server - Sending reply to the user
+17:32:32.831 [tekassh1 reader] INFO  Server - Reading client request.
+17:32:32.831 [tekassh1 executor] INFO  Server - Executing user "Show" command
+17:32:32.831 [tekassh1 sender] INFO  Server - Sending reply to the user
+17:33:28.280 [tekassh1 reader] WARN  Server - Force shutdown: tekassh1
+
