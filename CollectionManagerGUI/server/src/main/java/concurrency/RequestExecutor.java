@@ -64,6 +64,7 @@ public class RequestExecutor extends RecursiveAction {
             commandRes = ((Command) command).execute(user);
         }
         catch (IOException e){
+            e.printStackTrace();
             logger.error("Error command \"" + command.getClass().getSimpleName() + "\" executing.");
             return;
         }

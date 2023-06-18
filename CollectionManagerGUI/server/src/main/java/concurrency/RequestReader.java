@@ -89,6 +89,7 @@ public class RequestReader implements Runnable {
             }
         }
         catch (IOException | InterruptedException e) {
+            e.printStackTrace();
             logger.error("Error user command executing. Connection closed.");
         } catch (SQLException e) {
             logger.error("Error database access. Connection closed.");

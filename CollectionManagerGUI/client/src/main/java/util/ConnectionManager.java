@@ -13,9 +13,10 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.util.Iterator;
+import java.util.Set;
 
 public class ConnectionManager {
-    private static final String GREEN_BOLD = "\033[1;32m";
     public static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_RESET = "\u001B[0m";
@@ -30,13 +31,17 @@ public class ConnectionManager {
 
     private AuthorizationManager authorizationManager;
 
-    public ConnectionManager(Selector selector, SocketChannel sc, int port){
-        this.selector = selector;
-        this.sc = sc;
-        this.port = port;
+    public ConnectionManager() {
+        try {
+            selector = Selector.open();
+            sc = SocketChannel.open();
+        }
+        catch (IOException e) {
+            System.out.println("ConnectionManager init error!");
+        }
     }
 
-    public void setConnection(int port) throws IOException {
+    private synchronized void setConnection(int port) throws IOException {
         InetSocketAddress address = new InetSocketAddress(InetAddress.getByName("localhost"), port);
         sc.connect(address);
         sc.finishConnect();
@@ -46,7 +51,8 @@ public class ConnectionManager {
         sc.register(selector, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
     }
 
-    public boolean tryConnect() {
+    public synchronized boolean tryConnect(int port) {
+        this.port = port;
 
         long start = System.currentTimeMillis();
         int counter = 1;
@@ -82,26 +88,21 @@ public class ConnectionManager {
         }
     }
 
-    public boolean sendRequest(Command command, String token) {
+    public synchronized void sendRequest(Command command, String token) throws IOException{
         ClientRequest request = new ClientRequest(command);
         request.setToken(token);
         ByteBuffer bb = ByteBuffer.wrap(SerializationManager.serialize(request));
 
-        while (true){
-            try {
-                sc.write(bb);
-                return true;
-            }
-            catch (Exception e){
-                if (!tryConnect())
-                    return false;
-                if (!(command instanceof LogIn || command instanceof SignUp))
-                    authorizationManager.processAuthorization();
-            }
+        try {
+            sc.write(bb);
+        }
+        catch (Exception e){
+            if (!tryConnect(port))
+                throw new IOException();
         }
     }
 
-    public boolean sendAuthRequest(Command command){
+    public synchronized boolean sendAuthRequest(Command command) throws IOException{
         ClientRequest request = new ClientRequest(command);
 
         ByteBuffer bb = ByteBuffer.wrap(SerializationManager.serialize(request));
@@ -112,56 +113,78 @@ public class ConnectionManager {
                 return true;
             }
             catch (Exception e){
-                if (!tryConnect())
-                    return false;
-                if (!(command instanceof LogIn || command instanceof SignUp))
-                    authorizationManager.processAuthorization();
+                if (!tryConnect(port))
+                    throw new IOException();
             }
         }
     }
 
-    public boolean readResponse() {
-        ByteBuffer bb = ByteBuffer.allocate(20000);
+    public synchronized String readResponse() throws IOException{
+        StringBuilder res = new StringBuilder("");
 
-        try {
-            sc.read(bb);
-            ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
-            Object responseObj = response.getObj();
-            if (responseObj instanceof Integer){
-                packages = (Integer) responseObj;
-                isLongReply = true;
-            }
-            if (!isLongReply())
-                System.out.println("Server request:\n" + responseObj.toString());
-            else {
-                if (!isFirstPackage)
-                    packages--;
-                if (isFirstPackage) {
-                    System.out.println("Server request:\n");
-                    isFirstPackage = false;
+        while (true) {
+            ByteBuffer bb = ByteBuffer.allocate(20000);
+
+            if (selector.select() > 0) {
+                Set<SelectionKey> readySet = selector.selectedKeys();
+                Iterator<SelectionKey> readySetIterator = readySet.iterator();
+
+                SelectionKey key = null;
+
+                while (readySetIterator.hasNext()) {
+                    key = readySetIterator.next();
+                    readySetIterator.remove();
                 }
-                System.out.println(responseObj.toString());
-                if (packages == 0) {
-                    isLongReply = false;
+
+                try {
+                    if (!key.isReadable())
+                        continue;
+
+                    try {
+                        sc.read(bb);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
+                    Object responseObj = response.getObj();
+
+                    if (responseObj instanceof Integer){
+                        packages = (Integer) responseObj;
+                        isLongReply = true;
+                    }
+
+                    if (isLongReply) {
+                        if (!isFirstPackage)
+                            packages--;
+                        if (isFirstPackage) {
+                            isFirstPackage = false;
+                        }
+
+                        res.append(responseObj.toString());
+
+                        if (packages == 0) {
+                            isLongReply = false;
+                            return responseObj.toString();
+                        }
+                    }
+                    else
+                        return responseObj.toString();
+                }
+                catch (Exception e){
+                    if (!tryConnect(port))
+                        e.printStackTrace();
+
+                    if (isLongReply)
+                        isLongReply = false;
+
+                    System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
                 }
             }
-            return true;
-        }
-        catch (Exception e){
-            if (!tryConnect())
-                return false;
-
-            authorizationManager.processAuthorization();
-
-            if (isLongReply)
-                isLongReply = false;
-
-            System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
-            return true;
         }
     }
 
-    public Object[] readAuthorizationResponse() {
+    public synchronized Object[] readAuthorizationResponse() throws IOException {
         ByteBuffer bb = ByteBuffer.allocate(5000);
 
         Object[] res = new Object[2];
@@ -180,9 +203,9 @@ public class ConnectionManager {
                 res[1] = responseObj.getToken();
                 return res;
             }
-            catch (ClassNotFoundException | NullPointerException | IOException e){
-                if (!tryConnect())
-                    return res;
+            catch (ClassCastException | ClassNotFoundException | NullPointerException | IOException e){
+                if (!tryConnect(port))
+                    throw new IOException();
 
                 System.out.println(ANSI_RED + "\nError while reading authorization result. Try again.\n");
                 return res;
@@ -200,9 +223,5 @@ public class ConnectionManager {
 
     public static boolean isLongReply() {
         return isLongReply;
-    }
-
-    public void setAuthorizationManager(AuthorizationManager authorizationManager) {
-        this.authorizationManager = authorizationManager;
     }
 }

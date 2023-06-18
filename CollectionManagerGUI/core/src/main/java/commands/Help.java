@@ -41,9 +41,7 @@ public class Help extends AbstractCommand implements Command {
                         "\"filter_by_nationality nationality\" - вывести элементы, значение поля nationality которых " +
                         "равно заданному\n" +
                         "\"print_field_descending_height\" - вывести значения поля " +
-                        "height всех элементов в порядке убывания\n" +
-                        "\"exit\" - завершить программу (без сохранения в файл)\n");
-
+                        "height всех элементов в порядке убывания\n");
         return s.toString();
     }
 }

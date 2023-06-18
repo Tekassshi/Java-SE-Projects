@@ -2,9 +2,11 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 plugins {
     java
+//    `java-library`
     application
     id("com.github.seanrl.jaxb") version "2.5.1"
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("org.openjfx.javafxplugin") version "0.0.14"
     idea
 }
 
@@ -24,7 +26,11 @@ tasks.getByName<Test>("test") {
 }
 
 application {
-    mainClass.set("Client")
+    mainClass.set("Main")
+}
+
+javafx {
+    modules("javafx.controls", "javafx.fxml")
 }
 
 tasks.named<JavaExec>("run") {

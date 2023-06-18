@@ -26,8 +26,8 @@ public class RemoveAllByNationality extends AbstractCommand implements CommandWi
      * @param arg Nationality enum value in String representation.
      * */
     @Override
-    public void setArg(String arg) {
-        super.setArgument(InputManager.readNationality(arg));
+    public void setArg(String arg) throws IOException {
+        super.setArgument(InputManager.readNationality(arg).toString());
     }
 
     @Override

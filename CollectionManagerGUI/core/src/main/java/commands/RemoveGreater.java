@@ -1,6 +1,7 @@
 package commands;
 
 import data.Person;
+import data.PersonParamsContainer;
 import interfaces.AssemblableCommand;
 import interfaces.Command;
 import managers.CollectionManager;
@@ -25,21 +26,21 @@ public class RemoveGreater extends AbstractCommand implements Command, Assemblab
     }
 
     @Override
-    public void buildObject() {
-        System.out.println("\n--- A person to compare ---\n");
-
-        Person person = new Person();
-
-        person.setName(InputManager.readName());
-        person.setCoordinates(InputManager.readCoordinates());
-        person.setCreationDate(ZonedDateTime.now());
-        person.setHeight(InputManager.readHeight());
-        person.setWeight(InputManager.readWeight());
-        person.setEyeColor(InputManager.readEyeColor());
-        person.setNationality(InputManager.readNationality());
-        person.setLocation(InputManager.readLocation());
-
-        super.setObject(person);
+    public void buildObject(PersonParamsContainer container) {
+//        System.out.println("\n--- A person to compare ---\n");
+//
+//        Person person = new Person();
+//
+//        person.setName(InputManager.readName());
+//        person.setCoordinates(InputManager.readCoordinates());
+//        person.setCreationDate(ZonedDateTime.now());
+//        person.setHeight(InputManager.readHeight());
+//        person.setWeight(InputManager.readWeight());
+//        person.setEyeColor(InputManager.readEyeColor());
+//        person.setNationality(InputManager.readNationality());
+//        person.setLocation(InputManager.readLocation());
+//
+//        super.setObject(person);
     }
 
     @Override

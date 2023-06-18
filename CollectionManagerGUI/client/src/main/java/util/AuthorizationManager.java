@@ -10,10 +10,6 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class AuthorizationManager {
-    private static final String GREEN_BOLD = "\033[1;32m";
-    private final String ANSI_GREEN = "\u001B[32m";
-    private final String ANSI_RED = "\u001B[31m";
-    private final String ANSI_RESET = "\u001B[0m";
 
     private Selector selector;
     private ConnectionManager connectionManager;
@@ -25,44 +21,9 @@ public class AuthorizationManager {
         this.selector = connectionManager.getSelector();
     }
 
-    public void processAuthorization() {
-        while (true) {
-            System.out.println("\n-- Authorization --\n");
-
-            int type = InputManager.readAuthType();
-            boolean result;
-
-            try {
-                if (type == 1) {
-                    result = logIn();
-
-                    if (result == false) {
-                        System.out.println(ANSI_RED + "\nWrong username or password. Try again.\n" + ANSI_RESET);
-                        continue;
-                    }
-                    System.out.println(GREEN_BOLD + "\nAuthorization successful!\n" + ANSI_RESET);
-                    break;
-                }
-                else {
-                    result = signUp();
-
-                    if (result == false) {
-                        System.out.println(ANSI_RED + "\nThis username is already exists. Try again.\n" + ANSI_RESET);
-                        continue;
-                    }
-                    System.out.println(GREEN_BOLD + "\nAuthorization successful!\n" + ANSI_RESET);
-                    break;
-                }
-            }
-            catch (IOException | InterruptedException e){
-                System.out.println(ANSI_RED + "\nServer error. Try again.\n" + ANSI_RESET);
-            }
-        }
-    }
-
-    public boolean logIn() throws IOException, InterruptedException {
-        String username = InputManager.readUsername();
-        String password = InputManager.readPassword();
+    public synchronized boolean logIn(String username, String password) throws IOException, IllegalArgumentException {
+        InputManager.readUsername(username);
+        InputManager.readPassword(password);
 
         LogIn command = new LogIn(username, password);
         connectionManager.sendAuthRequest(command);
@@ -70,17 +31,17 @@ public class AuthorizationManager {
         return processAuthorizationResponse();
     }
 
-    public boolean signUp() throws IOException{
-        System.out.println(ANSI_GREEN + "\nCreating a new account" + ANSI_RESET);
-        String username = InputManager.readUsername();
-        String password = InputManager.readPassword();
+    public synchronized boolean signUp(String username, String password) throws IOException, IllegalArgumentException {
+        InputManager.readUsername(username);
+        InputManager.readPassword(password);
 
         SignUp command = new SignUp(username, password);
         connectionManager.sendAuthRequest(command);
+
         return processAuthorizationResponse();
     }
 
-    private boolean processAuthorizationResponse()
+    private synchronized boolean processAuthorizationResponse()
             throws IOException {
 
         while (true) {

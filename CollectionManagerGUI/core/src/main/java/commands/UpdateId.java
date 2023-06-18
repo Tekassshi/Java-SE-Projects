@@ -1,6 +1,7 @@
 package commands;
 
 import data.Person;
+import data.PersonParamsContainer;
 import interfaces.AssemblableCommand;
 import interfaces.CommandWithArg;
 import managers.CollectionManager;
@@ -35,21 +36,21 @@ public class UpdateId extends AbstractCommand implements CommandWithArg, Assembl
     }
 
     @Override
-    public void buildObject() {
-        System.out.println("\nEnter data to update id = " + super.getArgument() + "\n");
-
-        Person person = new Person();
-
-        person.setId(Integer.parseInt(super.getArgument()));
-        person.setName(InputManager.readName());
-        person.setCoordinates(InputManager.readCoordinates());
-        person.setHeight(InputManager.readHeight());
-        person.setWeight(InputManager.readWeight());
-        person.setEyeColor(InputManager.readEyeColor());
-        person.setNationality(InputManager.readNationality());
-        person.setLocation(InputManager.readLocation());
-
-        super.setObject(person);
+    public void buildObject(PersonParamsContainer container) {
+//        System.out.println("\nEnter data to update id = " + super.getArgument() + "\n");
+//
+//        Person person = new Person();
+//
+//        person.setId(Integer.parseInt(super.getArgument()));
+//        person.setName(InputManager.readName());
+//        person.setCoordinates(InputManager.readCoordinates());
+//        person.setHeight(InputManager.readHeight());
+//        person.setWeight(InputManager.readWeight());
+//        person.setEyeColor(InputManager.readEyeColor());
+//        person.setNationality(InputManager.readNationality());
+//        person.setLocation(InputManager.readLocation());
+//
+//        super.setObject(person);
     }
 
     @Override

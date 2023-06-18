@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Scene?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<Scene xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="guicontrollers.SignUpController">
+    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" styleClass="common" stylesheets="@../css/authorization.css">
+      <children>
+         <ImageView fitHeight="79.0" fitWidth="71.0" layoutX="315.0" layoutY="215.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+               <Image url="@../images/Rolling-1s-203px.gif" />
+            </image>
+         </ImageView>
+      </children></AnchorPane>
+</Scene>

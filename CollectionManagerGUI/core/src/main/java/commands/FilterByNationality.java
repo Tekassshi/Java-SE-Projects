@@ -5,6 +5,8 @@ import interfaces.CommandWithArg;
 import managers.CollectionManager;
 import managers.InputManager;
 
+import java.io.IOException;
+
 /**
  * Class for "filter_by_nationality" command. Command outputs all nodes in collection with given nationality.
  * */
@@ -23,8 +25,8 @@ public class FilterByNationality extends AbstractCommand implements CommandWithA
      * @param arg Nationality enum value in String representation.
      * */
     @Override
-    public void setArg(String arg) {
-        super.setArgument(InputManager.readNationality(arg));
+    public void setArg(String arg) throws IOException {
+        super.setArgument(InputManager.readNationality(arg).toString());
     }
 
     @Override

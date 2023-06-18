@@ -20,89 +20,25 @@ public class InputManager {
     static InputStreamReader isr = new InputStreamReader(System.in);
     static BufferedReader reader = new BufferedReader(isr);
 
-    public static int readPort(){
-        while (true) {
-            try {
-                System.out.print("Enter port to connect: ");
-                String portS = reader.readLine();
-                int port = Integer.parseInt(portS);
-                if (port <= 1024 || port > 65536)
-                    throw new NumberFormatException();
-                return port;
-            }
-            catch (IOException e){
-                System.out.println(ANSI_RED + "\nWrong data\n" + ANSI_RESET);
-                return 0;
-            }
-            catch (NumberFormatException e){
-                System.out.println(ANSI_RED + "\nWrong port value!\n" + ANSI_RESET);
-            }
-        }
+    public static int readPort(String input) throws NumberFormatException, IOException {
+        int port = Integer.parseInt(input);
+        if (port <= 1024 || port > 65536)
+            throw new NumberFormatException();
+        return port;
     }
 
-    public static int readAuthType() {
-        while (true) {
-            try {
-                System.out.print("Enter \"1\" - to log in, \"2\" - to sign up: ");
-                String input = reader.readLine();
-                int res = Integer.parseInt(input);
-
-                if (res == 1 || res == 2)
-                    return res;
-                else
-                    throw new IllegalArgumentException();
-            }
-            catch (IOException | IllegalArgumentException e){
-                System.out.println(ANSI_RED + "\nWrong input value! Try again.\n" + ANSI_RESET);
-            }
-        }
+    public static void readUsername(String username) throws IllegalArgumentException {
+        if (!isAuthWord(username))
+            throw new IllegalArgumentException();
     }
 
-    public static String readUsername(){
-        while (true) {
-            try {
-                System.out.print("\nEnter username: ");
-                String username = reader.readLine();
-                if (!isAuthWord(username))
-                    throw new IllegalArgumentException();
-                return username;
-            }
-            catch (IOException | IllegalArgumentException e){
-                System.out.println(ANSI_RED + "\nWrong username value! Max - 15 symbols and it should contains only " +
-                        "english letters or digits.\n" + ANSI_RESET);
-            }
-        }
-    }
-
-    public static String readPassword(){
-        while (true) {
-            try {
-                Console console = System.console();
-                System.out.print("Enter password: ");
-
-                char[] chars;
-                String password;
-                try {
-                    chars = console.readPassword();
-                    password = new String(chars);
-                }
-                catch (NullPointerException e) {
-                    password = reader.readLine();
-                }
-
-                if (!isAuthWord(password))
-                    throw new IllegalArgumentException();
-                return password;
-            }
-            catch (IllegalArgumentException | IOException e){
-                System.out.println(ANSI_RED + "\nWrong password value! Max - 15 symbols and it should contains only " +
-                        "english letters or digits.\n" + ANSI_RESET);
-            }
-        }
+    public static void readPassword(String password) throws IllegalArgumentException{
+        if (!isAuthWord(password))
+            throw new IllegalArgumentException();
     }
 
     public static boolean isAuthWord(String s){
-        if (s.length() > 15)
+        if (s.length() < 5 || s.length() > 15)
             return false;
         for (int i = 0; i < s.length(); i++){
             if ((s.charAt(i) < 'A' || s.charAt(i) > 'Z') &&
@@ -117,23 +53,10 @@ public class InputManager {
      * Utility method for reading "name" field value from default input stream.
      * @return valid "name" field String value.
      * */
-    public static String readName(){
-        while (true){
-            try {
-                System.out.print("Enter person name: ");
-                String name;
-                name = reader.readLine();
-
-                if (!isWord(name) || name.length() == 0)
-                    throw new IOException();
-                return name;
-            }
-            catch (IOException e){
-                System.out.println(ANSI_RED + "\nWrong name format!\n(Name should contain at least 1 symbol and " +
-                        "only letters supported)" + ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again.\n" + ANSI_RESET);
-            }
-        }
+    public static String readName(String name) throws IllegalArgumentException{
+        if (!isWord(name) || name.length() == 0)
+            throw new IllegalArgumentException();
+        return name;
     }
 
     /**
@@ -168,27 +91,13 @@ public class InputManager {
      * Utility method for reading "coordinates" field value from default input stream.
      * @return valid "coordinates" field "Coordinates" value.
      * */
-    public static Coordinates readCoordinates(){
-        while (true){
-            try {
-                System.out.print("\nEnter \"X\" coord (integer value): ");
-                int x = Integer.parseInt(reader.readLine());
-                if (x <= -783)
-                    throw new NumberFormatException();
-
-                System.out.print("Enter \"Y\" coord (long integer value): ");
-                Long y = Long.parseLong(reader.readLine());
-                System.out.println("");
-
-                Coordinates coordinates = new Coordinates(x, y);
-                return coordinates;
-            }
-            catch (NumberFormatException | IOException e){
-                System.out.println(ANSI_RED + "\nWrong coordinates format!\n(\"X\" should be integer number, " +
-                        "that > -783, \"Y\" should be long integer number." + ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again." + ANSI_RESET);
-            }
-        }
+    public static Coordinates readCoordinates(String xInput, String yInput) throws NumberFormatException, IOException {
+        int x = Integer.parseInt(xInput);
+        if (x <= -783)
+            throw new NumberFormatException();
+        Long y = Long.parseLong(yInput);
+        Coordinates coordinates = new Coordinates(x, y);
+        return coordinates;
     }
 
     /**
@@ -214,23 +123,11 @@ public class InputManager {
      * Utility method for reading "height" field value from default input stream.
      * @return valid "height" field Integer value.
      * */
-    public static Integer readHeight(){
-        while (true){
-            try {
-                System.out.print("Enter person height: ");
-                Integer height = Integer.parseInt(reader.readLine());
-
-                if (height <= 0)
-                    throw new IOException();
-
-                return height;
-            }
-            catch (NumberFormatException | IOException e){
-                System.out.println(ANSI_RED + "\nWrong height format!\n(height should be integer > 0, and " +
-                        "only digits supported)" + ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again.\n" + ANSI_RESET);
-            }
-        }
+    public static Integer readHeight(String inputHeight) throws NumberFormatException, IOException {
+        Integer height = Integer.parseInt(inputHeight);
+        if (height <= 0)
+            throw new IOException();
+        return height;
     }
 
     /**
@@ -249,27 +146,15 @@ public class InputManager {
      * Utility method for reading "weight" field value from default input stream.
      * @return valid "weight" field Float value.
      * */
-    public static Float readWeight(){
-        while (true){
-            try {
-                System.out.print("Enter person weight: ");
-                Float weight = Float.parseFloat(reader.readLine().replaceAll(",", "."));
+    public static Float readWeight(String inputWeight) throws NumberFormatException, IOException {
+        Float weight = Float.parseFloat(inputWeight.replaceAll(",", "."));
 
-                if(weight == Float.POSITIVE_INFINITY || weight == Float.NEGATIVE_INFINITY)
-                    throw new NumberFormatException();
+        if(weight == Float.POSITIVE_INFINITY || weight == Float.NEGATIVE_INFINITY)
+            throw new NumberFormatException();
+        if (weight <= 0)
+            throw new IOException();
 
-                if (weight <= 0)
-                    throw new IOException();
-
-                System.out.println("");
-                return weight;
-            }
-            catch (NumberFormatException | IOException e){
-                System.out.println(ANSI_RED + "\nWrong weight format!\n(weight should be decimal value > 0)"
-                        + ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again.\n" + ANSI_RESET);
-            }
-        }
+        return weight;
     }
 
     /**
@@ -290,26 +175,15 @@ public class InputManager {
      * Utility method for reading "eyeColor" field value from default input stream.
      * @return valid "eyeColor" field, Color enum value.
      * */
-    public static Color readEyeColor(){
-        while (true){
-            try {
-                System.out.print("Enter person eye color (GREEN, RED, BLACK, BLUE, YELLOW): ");
-                Color eye_color;
-                String tmp = reader.readLine().toUpperCase();
-
-                if (!tmp.equals(""))
-                    eye_color = Color.valueOf(tmp);
-                else
-                    eye_color = null;
-
-                return eye_color;
-            }
-            catch (IOException | IllegalArgumentException | NullPointerException e){
-                System.out.println(ANSI_RED + "\nWrong color value!\n(you can choose one of the values " +
-                        "GREEN, RED, BLACK, BLUE, YELLOW)" + ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again.\n" + ANSI_RESET);
-            }
-        }
+    public static Color readEyeColor(String inputEyeColor) throws IOException, IllegalArgumentException,
+            NullPointerException{
+        Color eye_color;
+        String tmp = inputEyeColor.toUpperCase();
+        if (!tmp.equals(""))
+            eye_color = Color.valueOf(tmp);
+        else
+            eye_color = null;
+        return eye_color;
     }
 
     /**
@@ -333,46 +207,10 @@ public class InputManager {
      * Utility method for reading "nationality" field value from default input stream.
      * @return valid "nationality" field Country class value.
      * */
-    public static Country readNationality(){
-        while (true){
-            try {
-                System.out.print("Enter person nationality (RUSSIA, FRANCE, THAILAND, NORTH_KOREA): ");
-                Country nationality = Country.valueOf(reader.readLine().toUpperCase());
-
-                return nationality;
-            }
-            catch (IOException | IllegalArgumentException | NullPointerException e){
-                System.out.println(ANSI_RED + "\nWrong nationality value!\n(you can choose one of the values " +
-                        "RUSSIA, FRANCE, THAILAND, NORTH_KOREA)" + ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again.\n" + ANSI_RESET);
-            }
-        }
-    }
-
-    /**
-     * Utility method for reading "nationality" field using input source.
-     * @param nationality value that we should to validate.
-     * @return valid "nationality" field in String representation.
-     * */
-    public static String readNationality(String nationality){
-        int f = 0;
-
-        while (true){
-            try {
-                if (f == 1) {
-                    System.out.print("Enter person nationality (RUSSIA, FRANCE, THAILAND, NORTH_KOREA): ");
-                    nationality = reader.readLine().toUpperCase();
-                }
-                Country tmp = Country.valueOf(nationality.toUpperCase());
-                return nationality.toUpperCase();
-            }
-            catch (IOException | IllegalArgumentException | NullPointerException e){
-                System.out.println(ANSI_RED + "\nWrong nationality value!\n(you can choose one of the values " +
-                        "RUSSIA, FRANCE, THAILAND, NORTH_KOREA)" + ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again.\n" + ANSI_RESET);
-                f = 1;
-            }
-        }
+    public static Country readNationality(String inputNationality) throws IOException, IllegalArgumentException,
+            NullPointerException {
+        Country nationality = Country.valueOf(inputNationality.toUpperCase());
+        return nationality;
     }
 
     /**
@@ -389,32 +227,18 @@ public class InputManager {
      * Utility method for reading "location" field value from default input stream.
      * @return valid "location" field, Location class object.
      * */
-    public static Location readLocation(){
-        while (true){
-            try {
-                System.out.print("\nEnter \"X\" coord (Float value): ");
-                Integer x = Integer.parseInt(reader.readLine());
+    public static Location readLocation(String xLoc, String yLoc, String zLoc) throws NumberFormatException,
+            IOException {
 
-                if(x == Float.POSITIVE_INFINITY || x == Float.NEGATIVE_INFINITY)
-                    throw new NumberFormatException();
+        Integer x = Integer.parseInt(xLoc);
+        if(x == Float.POSITIVE_INFINITY || x == Float.NEGATIVE_INFINITY)
+            throw new NumberFormatException();
 
-                System.out.print("Enter \"Y\" coord (Integer value): ");
-                Float y = Float.parseFloat(reader.readLine().replaceAll(",", "."));
+        Float y = Float.parseFloat(yLoc.replaceAll(",", "."));
+        Double z = Double.parseDouble(zLoc.replaceAll(",", "."));
 
-                System.out.print("Enter \"Z\" coord (Double value): ");
-                Double z = Double.parseDouble(reader.readLine().replaceAll(",", "."));
-                System.out.println("");
-
-                Location location = new Location(x, y, z);
-                return location;
-            }
-            catch (NumberFormatException | IOException e){
-                System.out.println(ANSI_RED + "\nWrong location format!\n(\"X\" should be Float number, "  +
-                        "\"Y\" should be Integer number, " +
-                        "\"Z\" should be Double number." +ANSI_RESET);
-                System.out.println(ANSI_RED + "Try again." + ANSI_RESET);
-            }
-        }
+        Location location = new Location(x, y, z);
+        return location;
     }
 
     /**

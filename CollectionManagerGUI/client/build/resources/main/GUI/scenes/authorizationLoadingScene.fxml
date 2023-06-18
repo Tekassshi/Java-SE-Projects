@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Scene?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<Scene xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+    <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" styleClass="common" stylesheets="@../css/authorization.css">
+      <children>
+         <ImageView fitHeight="79.0" fitWidth="71.0" layoutX="321.0" layoutY="215.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+               <Image url="@../images/Rolling-1s-203px.gif" />
+            </image>
+         </ImageView>
+         <ImageView fitHeight="119.0" fitWidth="124.0" layoutX="300.0" layoutY="66.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+               <Image url="@../images/LOGO.png" />
+            </image>
+         </ImageView>
+      </children></AnchorPane>
+</Scene>

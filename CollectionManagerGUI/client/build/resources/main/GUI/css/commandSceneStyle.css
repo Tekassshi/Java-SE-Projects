@@ -1,0 +1,24 @@
+.common {
+    -fx-background-color: #ffffff;
+}
+
+.selectButton{
+    -fx-text-fill: #ffffff;
+    -fx-background-color: #1d9bff;
+    -fx-opacity: 1;
+}
+
+.selectButton:hover{
+    -fx-background-color: #1a8eea;
+}
+
+.text-field{
+    -fx-background-color: #e5e5e5;
+}
+
+.text-field:focused{
+    -fx-background-color: #e5e5e5;
+    -fx-border-width: 1;
+    -fx-border-radius: 2%;
+    -fx-border-color: #1d9bff;
+}

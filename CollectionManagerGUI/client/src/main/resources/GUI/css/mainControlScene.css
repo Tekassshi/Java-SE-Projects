@@ -1,0 +1,50 @@
+.common{
+    -fx-background-color: #ffffff;
+}
+
+.selectButton{
+    -fx-background-color: #1d9bff;
+}
+
+.selectButton:hover{
+    -fx-background-color: #1a8eea;
+}
+
+.table {
+    -fx-selection-bar: #1d9bff;
+}
+
+.table .column-header {
+    -fx-background-color: #dedede;
+    -fx-border-width: 1;
+    -fx-border-color: #b6b6b6;
+}
+
+.table:focused {
+    -fx-border-color: #1d9bff;
+    -fx-background-color: #ffffff;
+}
+
+.languageBtn {
+    -fx-background-color: #ffffff;
+}
+
+.commandBtn {
+    -fx-background-color: #e5e5e5;
+}
+
+.commandBtn:hover{
+    -fx-background-color: #dedede;
+}
+
+.commandBtn .menu-item:focused {
+    -fx-background-color: #1d9bff;
+}
+
+.exitButton {
+    -fx-background-color: #db5656;
+}
+
+.exitButton:hover {
+    -fx-background-color: #cc4f4f;
+}

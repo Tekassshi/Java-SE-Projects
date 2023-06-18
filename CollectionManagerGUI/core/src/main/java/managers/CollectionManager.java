@@ -23,10 +23,6 @@ public class CollectionManager {
     private Deque<Person> collection = new LinkedBlockingDeque<>();
     private Connection connection;
 
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_RESET = "\u001B[0m";
-
     private Logger LOGGER;
 
     public CollectionManager(Connection connection, Logger logger){
@@ -165,7 +161,7 @@ public class CollectionManager {
      * */
     public synchronized String show() {
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         final StringBuilder builder = new StringBuilder("");
@@ -206,11 +202,11 @@ public class CollectionManager {
             insertPersonQuery(username, person);
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "Person was added successfully!\n" + ANSI_RESET;
+            return "Person was added successfully!\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error inserting or load data from database.");
-            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+            return "Error updating, inserting or loading data from database.\n";
         }
     }
 
@@ -227,9 +223,9 @@ public class CollectionManager {
 
         if (compareRes >= 0) {
             String s = "";
-            s += ANSI_RED + "\nYour element value is bigger or the same " +
-                    "than min element in collection\n" + ANSI_RESET;
-            s += ANSI_RED + "Element will not be recorded.\n" + ANSI_RESET;
+            s += "\nYour element value is bigger or the same " +
+                    "than min element in collection\n";
+            s += "Element will not be recorded.\n";
             return s;
         }
 
@@ -237,11 +233,11 @@ public class CollectionManager {
             insertPersonQuery(username, person);
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "Person was added successfully!\n" + ANSI_RESET;
+            return "Person was added successfully!\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error inserting or load data from database.");
-            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+            return "Error updating, inserting or loading data from database.\n";
         }
     }
 
@@ -268,29 +264,29 @@ public class CollectionManager {
      * */
     public synchronized String updateId(String username, Person person) {
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         try {
             if (!isIdExist((int) person.getId())) {
-                String s = ANSI_RED + "\nId, that you want to update, doesn't exist!" + ANSI_RESET;
-                s += ANSI_RED + "\nTry again\n" + ANSI_RESET;
+                String s = "\nId, that you want to update, doesn't exist!";
+                s += "\nTry again\n";
                 return s;
             }
             else if (!isOwner(username, (int) person.getId())) {
-                String s = ANSI_RED + "\nYou can edit only your own records!" + ANSI_RESET;
-                s += ANSI_RED + "\nTry again.\n" + ANSI_RESET;
+                String s = "\nYou can edit only your own records!";
+                s += "\nTry again.\n";
                 return s;
             }
 
             updatePersonQuery(person);
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "\nPerson with id = " + person.getId() + " was successfully updated!\n";
+            return "\nPerson with id = " + person.getId() + " was successfully updated!\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error inserting or load data from database.");
-            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+            return "Error updating, inserting or loading data from database.\n";
         }
     }
 
@@ -340,13 +336,13 @@ public class CollectionManager {
      * */
     public synchronized String removeById(String username, int id) {
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         try {
             if (!isOwner(username, id)) {
-                String s = ANSI_RED + "\nYou can edit only your own records!" + ANSI_RESET;
-                s += ANSI_RED + "\nTry again.\n" + ANSI_RESET;
+                String s = "\nYou can edit only your own records!";
+                s += "\nTry again.\n";
                 return s;
             }
 
@@ -358,18 +354,18 @@ public class CollectionManager {
 
             if (res == 0) {
                 String s = "";
-                s += ANSI_RED + "\nPerson with given id value doesn't exist!" + ANSI_RESET;
-                s += ANSI_RED + "Try again.\n" + ANSI_RESET;
+                s += "\nPerson with given id value doesn't exist!";
+                s += "Try again.\n";
                 return s;
             }
 
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "\nPerson with id = " + id + " was successfully removed!\n" + ANSI_RESET;
+            return "\nPerson with id = " + id + " was successfully removed!\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error with database.");
-            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+            return "Error updating, inserting or loading data from database.\n";
         }
     }
 
@@ -379,7 +375,7 @@ public class CollectionManager {
      * */
     public synchronized String clear(String username) {
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         try {
@@ -390,11 +386,11 @@ public class CollectionManager {
 
             statement.execute();
             loadCollection();
-            return ANSI_GREEN + "\nAll your own records successfully cleared.\n" + ANSI_RESET;
+            return "\nAll your own records successfully cleared.\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error with database.");
-            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+            return "Error updating, inserting or loading data from database.\n";
         }
     }
 
@@ -413,7 +409,7 @@ public class CollectionManager {
      * */
     public synchronized String head(){
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
         return showPerson(collection.peekFirst());
     }
@@ -425,7 +421,7 @@ public class CollectionManager {
      * */
     public synchronized String removeGreater(String username, Person person) {
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         try {
@@ -440,11 +436,11 @@ public class CollectionManager {
             }
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "\nYour own records have been successfully removed!\n" + ANSI_RESET;
+            return "\nYour own records have been successfully removed!\n";
         }
         catch (SQLException e){
             LOGGER.warn("Error with database.");
-            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+            return "Error updating, inserting or loading data from database.\n";
         }
     }
 
@@ -455,7 +451,7 @@ public class CollectionManager {
      * */
     public synchronized String removeAllByNationality(String username, Country nationality){
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         try {
@@ -468,11 +464,11 @@ public class CollectionManager {
             statement.execute();
             loadCollection();
             defaultSort();
-            return ANSI_GREEN + "\nYour own records have been successfully removed!\n" + ANSI_RESET;
+            return "\nYour own records have been successfully removed!\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error with database.");
-            return ANSI_RED + "Error updating, inserting or loading data from database.\n" + ANSI_RESET;
+            return "Error updating, inserting or loading data from database.\n";
         }
     }
 
@@ -483,7 +479,7 @@ public class CollectionManager {
      * */
     public synchronized String filterByNationality(String username, Country nationality){
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         final StringBuilder builder = new StringBuilder("");
@@ -498,7 +494,7 @@ public class CollectionManager {
      * */
     public synchronized String printFieldDescendingHeight(){
         if (collection.size() == 0) {
-            return ANSI_RED + "\nCollection is empty!\n" + ANSI_RESET;
+            return "\nCollection is empty!\n";
         }
 
         StringBuilder builder = new StringBuilder("");
@@ -531,7 +527,6 @@ public class CollectionManager {
      * */
     public synchronized String info(){
         String s = "";
-        s += ANSI_GREEN + "\n--- Collection info ---\n" + ANSI_RESET;
         s += "Collection type: ArrayDeque<Person>" + "\n";
         s += "Number of elements: " + collection.size() + "\n\n";
         return s;

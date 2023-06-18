@@ -1,6 +1,7 @@
 package interfaces;
 
 import data.Person;
+import data.PersonParamsContainer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,7 +12,7 @@ public interface AssemblableCommand {
      * AssemlableCommand interface method for building Person object from default input stream to add it to collection.
      * @see Person
      * */
-    void buildObject();
+    void buildObject(PersonParamsContainer container);
 
     /**
      * AssemlableCommand interface method for building Person object from given stream to add it to collection.
