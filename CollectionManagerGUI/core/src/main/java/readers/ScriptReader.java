@@ -7,10 +7,7 @@ import interfaces.AssemblableCommand;
 import interfaces.Command;
 import interfaces.CommandWithArg;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.InputMismatchException;
 import java.util.Queue;
 
@@ -18,9 +15,10 @@ public class ScriptReader {
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_RESET = "\u001B[0m";
 
-    public static boolean ReadScript(String file_path, Queue<Command> commandQueue){
+    public static void ReadScript(String file_path, Queue<Command> commandQueue) throws IOException {
+
         if (file_path == null)
-            return false;
+            throw new FileNotFoundException();
 
         System.out.println("\nExecuting user script");
         CommandFactory.scripts.add(file_path);
@@ -44,13 +42,13 @@ public class ScriptReader {
                 if (command == null) {
                     System.out.println(ANSI_RED + "Line: " + line + ANSI_RESET);
                     System.out.println(ANSI_RED + "Wrong command.\n" + ANSI_RESET);
-                    return false;
+                   continue;
                 }
                 if (command instanceof CommandWithArg) {
                     if (values.length < 2) {
-                        System.out.println(ANSI_RED + "You should input argument to this command. (Command skipped)\n"
+                        System.out.println(ANSI_RED + "You should input argument to this command.\n"
                                 + ANSI_RESET);
-                        return false;
+                       continue;
                     }
 
                     CommandWithArg tmp = (CommandWithArg) command;
@@ -60,12 +58,11 @@ public class ScriptReader {
                     String path = ((AbstractCommand) command).getArgument();
                     if (CommandFactory.scripts.contains(path)) {
                         commandQueue.clear();
+                        CommandFactory.scripts.clear();
                         throw new RuntimeException();
                     }
-                    CommandFactory.scripts.add(path);
-                    boolean result = ScriptReader.ReadScript(path, commandQueue);
-                    if (result == false)
-                        return false;
+
+                    ScriptReader.ReadScript(path, commandQueue);
                     continue;
                 }
 
@@ -76,26 +73,17 @@ public class ScriptReader {
                     try {
                         tmp.buildObjectFromScript(reader);
                     }
-                    catch (IOException | InputMismatchException e){
-                        System.out.println(ANSI_RED + "Wrong data in script. Process terminated.\n"
-                                + ANSI_RESET);
-                        return false;
+                    catch (IOException e) {
+                        commandQueue.clear();
+                        CommandFactory.scripts.clear();
+                        throw new IOException();
                     }
                 }
 
                 commandQueue.add(command);
                 line++;
-                CommandFactory.scripts.remove(file_path);
             }
-            return true;
-        }
-        catch (IllegalArgumentException | IOException | InputMismatchException | NullPointerException e) {
-            System.out.println(ANSI_RED + "Wrong data in script. Process will be terminated.\n" + ANSI_RESET);
-            return false;
-        }
-        catch (RuntimeException e){
-            System.out.println(ANSI_RED + "Recursion detected. Process will be terminated.\n" + ANSI_RESET);
-            return false;
+            CommandFactory.scripts.remove(file_path);
         }
     }
 }

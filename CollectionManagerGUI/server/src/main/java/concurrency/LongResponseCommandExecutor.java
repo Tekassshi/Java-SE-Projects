@@ -1,9 +1,6 @@
 package concurrency;
 
-import commands.AbstractCommand;
-import commands.FilterByNationality;
-import commands.PrintFieldDescendingHeight;
-import commands.Show;
+import commands.*;
 import data.Country;
 import data.Person;
 import managers.CollectionManager;
@@ -31,7 +28,9 @@ public class LongResponseCommandExecutor extends RecursiveTask<ArrayList<Person>
         else if (command instanceof PrintFieldDescendingHeight) {
             tmp = collectionManager.getDescendingHeightCollection();
         }
-
+        else if (command instanceof UpdateCollection) {
+            tmp = new ArrayList<>(collectionManager.getCollection());
+        }
         return tmp;
     }
 }

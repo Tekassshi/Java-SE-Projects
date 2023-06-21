@@ -13,9 +13,6 @@ import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 
-import static managers.CollectionManager.ANSI_GREEN;
-import static managers.CollectionManager.ANSI_RESET;
-
 public class Server extends ServerTemplate {
     private DatabaseManager dbManager;
     private CollectionManager collectionManager;
@@ -60,8 +57,7 @@ public class Server extends ServerTemplate {
         ExecutorService fixedThreadPool = ThreadPoolFactory.getFixedThreadPool();
 
         logger.info("Request processor was started successfully.\n");
-        System.out.println("Server is currently running on port: " + ANSI_GREEN + serverSocket.getLocalPort()
-                + ANSI_RESET + "\n");
+        System.out.println("Server is currently running on port: " +  serverSocket.getLocalPort() + "\n");
 
         while (true) {
             Socket client = serverSocket.accept();

@@ -293,24 +293,14 @@ public class InputManager {
      * @param file_name file_path that we should to validate.
      * @return valid file path value.
      * */
-    public static String readFile(String file_name) {
+    public static String readFile(String file_name) throws FileNotFoundException {
         String file_dir = System.getProperty("user.dir") + "/";
         String file_path = file_dir + file_name;
 
         File file = new File(file_path);
 
-        try {
-            FileReader fileReader = new FileReader(file);
-            BufferedReader reader = new BufferedReader(fileReader);
-
-            return file_path;
-        }
-        catch (FileNotFoundException e){
-            System.out.println(ANSI_RED + "\nFile called \"" + file_name + "\" not found in \"" + file_dir
-                    +"\". File should be located in one folder with .jar"+ ANSI_RESET);
-            System.out.println(ANSI_RED + "Your file should be located in \"" + file_dir + "\". " +
-                    "Please, create file with script in this directory and try again."+ ANSI_RESET + "\n");
-            return null;
-        }
+        FileReader fileReader = new FileReader(file);
+        BufferedReader reader = new BufferedReader(fileReader);
+        return file_path;
     }
 }

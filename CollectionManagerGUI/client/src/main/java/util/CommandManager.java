@@ -2,8 +2,8 @@ package util;
 
 import commands.ExecuteScript;
 import data.UserCollection;
+import factories.CommandFactory;
 import interfaces.Command;
-import managers.CollectionManager;
 import readers.ScriptReader;
 
 import java.io.*;
@@ -12,7 +12,6 @@ import java.nio.channels.Selector;
 import java.util.*;
 
 public class CommandManager {
-
     private boolean isRequestProcessed = true;
     private Queue<Command> commandQueue = new LinkedList<>();
     private AuthorizationManager authorizationManager;
@@ -25,9 +24,10 @@ public class CommandManager {
         this.authorizationManager = authorizationManager;
         this.connectionManager = connectionManager;
         this.selector = connectionManager.getSelector();
+        CommandFactory.setCollectionManager(null);
     }
 
-    public String processUserCommand(Command command) throws IOException {
+    public synchronized String processUserCommand(Command command) throws IOException {
         if (selector.select() > 0) {
             Set<SelectionKey> readySet = selector.selectedKeys();
             Iterator<SelectionKey> readySetIterator = readySet.iterator();
@@ -42,9 +42,7 @@ public class CommandManager {
             if (key.isWritable()) {
                 if (command instanceof ExecuteScript) {
                     String path = ((ExecuteScript) command).getArgument();
-                    boolean result = ScriptReader.ReadScript(path, commandQueue);
-                    if (!result)
-                        commandQueue.clear();
+                    ScriptReader.ReadScript(path, commandQueue);
                     return processScriptCommands();
                 }
                 else
@@ -56,9 +54,8 @@ public class CommandManager {
 
     private String processScriptCommands() throws IOException {
         StringBuilder res = new StringBuilder("");
-        int numOfCommands = commandQueue.size();
 
-        for (int i = 0; i < numOfCommands + 1; i++) {
+        while (!commandQueue.isEmpty()) {
             if (selector.select() > 0) {
                 Set<SelectionKey> readySet = selector.selectedKeys();
                 Iterator<SelectionKey> readySetIterator = readySet.iterator();
@@ -69,17 +66,17 @@ public class CommandManager {
                     key = readySetIterator.next();
                     readySetIterator.remove();
                 }
-                if (key.isReadable()) {
-                    res.append(connectionManager.readResponse());
-                }
-                if (key.isWritable() && !commandQueue.isEmpty()) {
+                if (key.isWritable()) {
                     Command command = commandQueue.poll();
                     connectionManager.sendRequest(command, authorizationManager.getToken());
                 }
+                res.append(connectionManager.readResponse());
             }
         }
         return res.toString();
     }
 
-
+    public Queue<Command> getCommandQueue() {
+        return commandQueue;
+    }
 }

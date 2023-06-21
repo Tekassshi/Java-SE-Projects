@@ -1,5 +1,6 @@
 package guicontrollers;
 
+import guicontrollers.abstractions.LanguageChanger;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -9,9 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
@@ -23,9 +22,20 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class AuthorizationController implements Initializable {
+public class AuthorizationController extends LanguageChanger implements Initializable {
     private AuthorizationManager authorizationManager = UserSessionManager.getAuthorizationManager();
-    private ConnectionManager connectionManager = UserSessionManager.getConnectionManager();
+
+    @FXML
+    private MenuButton languageMenu;
+
+    @FXML
+    private Button logInButton;
+
+    @FXML
+    private Text SignUpPromt;
+
+    @FXML
+    private Button signUpButton;
 
     @FXML
     private PasswordField passHiddenField;
@@ -45,6 +55,8 @@ public class AuthorizationController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setDefaultDesign();
+        super.setMenuButton(languageMenu);
+        changeLanguage();
 
         passHiddenField.setOnKeyPressed(key -> {
             if (key.getCode().equals(KeyCode.ENTER)) {
@@ -126,16 +138,21 @@ public class AuthorizationController implements Initializable {
         new Thread(authTask).start();
     }
 
+    @Override
+    public void changeLanguage() {
+        languageMenu.setText(UserSessionManager.getCurrentBundle().getString("lang"));
+        SignUpPromt.setText(UserSessionManager.getCurrentBundle().getString("signUpMsg"));
+        signUpButton.setText(UserSessionManager.getCurrentBundle().getString("Sign Up"));
+        passHiddenField.setPromptText(UserSessionManager.getCurrentBundle().getString("Password"));
+        usernameField.setPromptText(UserSessionManager.getCurrentBundle().getString("Username"));
+        logInButton.setText(UserSessionManager.getCurrentBundle().getString("logIn"));
+    }
+
     private void loadWelcomePage(String user) throws IOException{
         Scene welcomeScene = FXMLLoader
                 .load(getClass().getResource("/GUI/scenes/welcomePageScene.fxml"));
         Parent root = welcomeScene.getRoot();
         Text username = (Text) root.lookup("#username");
-        Text welcomeText = (Text) root.lookup("#welcomeMsg");
-        welcomeText.setText("Welcome back, ");
-
-        welcomeText.setX(12);
-        username.setX(12);
 
         username.setText(user);
         SessionController.setScene(welcomeScene);
@@ -145,7 +162,7 @@ public class AuthorizationController implements Initializable {
         Scene scene = FXMLLoader.load(getClass().getResource("/GUI/scenes/portChoiceScene.fxml"));
         Parent root = scene.getRoot();
         Text errorMsg = (Text) root.lookup("#errorMsg");
-        errorMsg.setText("Server error. Please, try later.");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Server error. Please, try later."));
         errorMsg.setVisible(true);
         SessionController.setScene(scene);
     }
@@ -164,8 +181,9 @@ public class AuthorizationController implements Initializable {
         passHiddenField.setStyle("-fx-background-color: #ffe6e6");
         showPass.setStyle("-fx-background-color: #ffe6e6");
 
-        errorMsg.setText("Wrong username or password format (From 5 to 15 symbols and they " +
-                "should contains only english letters or digits.)");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong username or password format " +
+                "(From 5 to 15 symbols and they " +
+                "should contains only english letters or digits.)"));
         errorMsg.setVisible(true);
     }
 
@@ -175,7 +193,7 @@ public class AuthorizationController implements Initializable {
         passHiddenField.setStyle("-fx-background-color: #ffe6e6");
         showPass.setStyle("-fx-background-color: #ffe6e6");
 
-        errorMsg.setText("Wrong username or password!");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong username or password!"));
         errorMsg.setVisible(true);
     }
 

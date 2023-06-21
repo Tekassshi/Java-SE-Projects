@@ -2,20 +2,31 @@ package guicontrollers.commandguicontrollers;
 
 import commands.Add;
 import data.*;
+import guicontrollers.SessionController;
 import interfaces.AssemblableCommand;
 import interfaces.Command;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
+import javafx.stage.Stage;
 import managers.InputManager;
 import util.UserSessionManager;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static guicontrollers.SessionController.getStage;
 
 public class AddSceneController implements Initializable {
 
@@ -58,6 +69,17 @@ public class AddSceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         errorMsg.setVisible(false);
+
+        sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                try {
+                    sendCommand();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
 
         nameField.setOnKeyPressed(key -> {
             if (key.getCode().equals(KeyCode.ENTER)) {
@@ -134,7 +156,7 @@ public class AddSceneController implements Initializable {
             personParamsContainer.setName(name);
         }
         catch (IllegalArgumentException e) {
-            errorMsg.setText(" Wrong name format! Name should contain at least 1 symbol and " +
+            errorMsg.setText("Wrong name format! Name should contain at least 1 symbol and " +
                     "only letters supported");
             errorMsg.setVisible(true);
             nameField.setStyle("-fx-background-color: #ffe6e6");
@@ -220,11 +242,42 @@ public class AddSceneController implements Initializable {
 
         AssemblableCommand add = new Add(null);
         add.buildObject(personParamsContainer);
-        String res = UserSessionManager.getCommandManager().processUserCommand((Command) add);
-        System.out.println(res);
+
+        Stage currentStage = (Stage) nameField.getScene().getWindow();
+        currentStage.close();
+        Stage resStage = SessionController.openResWindow();
+
+        Task<String> commandTask = new Task<>() {
+            @Override
+            protected String call() throws Exception {
+                return UserSessionManager.getCommandManager().processUserCommand((Command) add);
+            }
+        };
+
+        commandTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                Parent root = resStage.getScene().getRoot();
+                TextArea response = (TextArea) root.lookup("#textArea");
+                VBox vBox = (VBox) root.lookup("#vBox");
+                vBox.setVisible(true);
+                vBox.setDisable(false);
+                response.setText(commandTask.getValue());
+                response.setEditable(false);
+            }
+        });
+
+        commandTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
+            @Override
+            public void handle(WorkerStateEvent event) {
+                commandTask.getException().printStackTrace();
+            }
+        });
+
+        new Thread(commandTask).start();
     }
 
-    public void setDefaultDesign(){
+    private void setDefaultDesign(){
         errorMsg.setVisible(false);
         eyeColorField.setStyle("-fx-background-color: #e5e5e5");
         heightField.setStyle("-fx-background-color: #e5e5e5");

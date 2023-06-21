@@ -1,5 +1,6 @@
 package guicontrollers;
 
+import guicontrollers.abstractions.LanguageChanger;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -10,6 +11,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
@@ -23,12 +25,17 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class SignUpController implements Initializable {
+public class SignUpController extends LanguageChanger implements Initializable {
     private AuthorizationManager authorizationManager = UserSessionManager.getAuthorizationManager();
-    private ConnectionManager connectionManager = UserSessionManager.getConnectionManager();
 
     @FXML
-    private TextField usernameField;
+    private Button signUpButton;
+
+    @FXML
+    private Text errorMsg;
+
+    @FXML
+    private MenuButton languageMenu;
 
     @FXML
     private PasswordField passHiddenField;
@@ -37,17 +44,22 @@ public class SignUpController implements Initializable {
     private TextField passVisibleField;
 
     @FXML
-    private PasswordField repPasswordField;
+    private Text promtText;
 
     @FXML
-    private Text errorMsg;
+    private PasswordField repPasswordField;
 
     @FXML
     private Button showPass;
 
+    @FXML
+    private TextField usernameField;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setDefaultDesign();
+        super.setMenuButton(languageMenu);
+        changeLanguage();
 
         usernameField.setOnKeyPressed(key -> {
             if (key.getCode().equals(KeyCode.ENTER)) {
@@ -144,7 +156,7 @@ public class SignUpController implements Initializable {
         Scene scene = FXMLLoader.load(getClass().getResource("/GUI/scenes/portChoiceScene.fxml"));
         Parent root = scene.getRoot();
         Text errorMsg = (Text) root.lookup("#errorMsg");
-        errorMsg.setText("Server error. Please, try later.");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Server error. Please, try later."));
         errorMsg.setVisible(true);
         SessionController.setScene(scene);
     }
@@ -156,6 +168,7 @@ public class SignUpController implements Initializable {
         Text username = (Text) root.lookup("#username");
         Text welcomeText = (Text) root.lookup("#welcomeMsg");
         Text succRegText = (Text) root.lookup("#succRegText");
+        succRegText.setText(UserSessionManager.getCurrentBundle().getString("RegSucc"));
         succRegText.setVisible(true);
 
         welcomeText.setText("Welcome, ");
@@ -178,14 +191,15 @@ public class SignUpController implements Initializable {
         passHiddenField.setStyle("-fx-background-color: #ffe6e6");
         showPass.setStyle("-fx-background-color: #ffe6e6");
 
-        errorMsg.setText("Wrong username or password format (From 5 to 15 symbols and they " +
-                "should contains only english letters or digits.)");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong username or password " +
+                "format (From 5 to 15 symbols and they " +
+                "should contains only english letters or digits.)"));
         errorMsg.setVisible(true);
     }
 
     public void setBadUsernameDesign(){
         usernameField.setStyle("-fx-background-color: #ffe6e6");
-        errorMsg.setText("This username is already exists");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("This username is already exists"));
         errorMsg.setVisible(true);
     }
 
@@ -195,7 +209,7 @@ public class SignUpController implements Initializable {
         repPasswordField.setStyle("-fx-background-color: #ffe6e6");
         showPass.setStyle("-fx-background-color: #ffe6e6");
 
-        errorMsg.setText("Passwords are different!");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Passwords are different!"));
         errorMsg.setVisible(true);
     }
 
@@ -214,5 +228,15 @@ public class SignUpController implements Initializable {
     public void rollbackToAuth(ActionEvent e) throws Exception{
         Scene scene = FXMLLoader.load(getClass().getResource("/GUI/scenes/authorizationScene.fxml"));
         SessionController.setScene(scene);
+    }
+
+    @Override
+    protected void changeLanguage() {
+        languageMenu.setText(UserSessionManager.getCurrentBundle().getString("lang"));
+        usernameField.setPromptText(UserSessionManager.getCurrentBundle().getString("Username"));
+        passHiddenField.setPromptText(UserSessionManager.getCurrentBundle().getString("Password"));
+        repPasswordField.setPromptText(UserSessionManager.getCurrentBundle().getString("Repeat password"));
+        signUpButton.setText(UserSessionManager.getCurrentBundle().getString("Sign Up"));
+        promtText.setText(UserSessionManager.getCurrentBundle().getString("Creating a new account"));
     }
 }

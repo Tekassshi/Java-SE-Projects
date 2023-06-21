@@ -21,6 +21,8 @@ public class Person implements Serializable {
     private Location location;
 
     private String username;
+
+
     /**
      * Builder design pattern for Person class.
      * */

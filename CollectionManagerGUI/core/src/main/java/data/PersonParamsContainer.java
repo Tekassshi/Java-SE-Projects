@@ -2,6 +2,8 @@ package data;
 
 public class PersonParamsContainer {
 
+    private Long id;
+
     private String name;
     private String xCoord;
     private String yCoord;
@@ -13,6 +15,14 @@ public class PersonParamsContainer {
     private String xLooc;
     private String yLooc;
     private String zLooc;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

@@ -1,6 +1,7 @@
 package concurrency;
 
 import commands.AbstractCommand;
+import commands.UpdateCollection;
 import connection.ClientRequest;
 import connection.ServerResponse;
 import interfaces.Command;
@@ -50,8 +51,8 @@ public class RequestExecutor extends RecursiveAction {
         logger.info("Executing user \"" + command.getClass().getSimpleName() + "\" command");
         String commandName = command.getClass().getSimpleName();
 
-        if (collectionManager.getCollectionSize() > 40 &&
-                longReplyCommands.contains(commandName)){
+        if ((collectionManager.getCollectionSize() > 40 &&
+                longReplyCommands.contains(commandName)) || command instanceof UpdateCollection){
 
             LongResponseSender longResponseSenderTask =
                     new LongResponseSender(socket, user, collectionManager, command);

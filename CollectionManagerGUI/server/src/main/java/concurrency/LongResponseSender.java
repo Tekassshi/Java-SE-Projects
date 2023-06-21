@@ -1,6 +1,7 @@
 package concurrency;
 
 import commands.AbstractCommand;
+import commands.UpdateCollection;
 import connection.ServerResponse;
 import data.Person;
 import managers.CollectionManager;
@@ -39,14 +40,44 @@ public class LongResponseSender extends RecursiveAction {
                 new LongResponseCommandExecutor(collectionManager, command);
         ArrayList<Person> tmp = forkJoinExecutorsPoolPool.invoke(longResponseCommandExecutorTask);
 
-        double packageSize = calcOptimalPackageSize(20000);
+        double packageSize = 30;
+        if (!(command instanceof UpdateCollection)){
+            packageSize = calcOptimalStringPackageSize(20000);
+        }
+        else {
+
+            if (collectionManager.getCollectionHash() == collectionManager.getUpdatedHash(socket)) {
+                ServerResponse response = new ServerResponse(null);
+                ResponseSender responseSenderTask = new ResponseSender(socket, user, response, false);
+                forkJoinSendersPool.invoke(responseSenderTask);
+                return;
+            }
+        }
+
+        collectionManager.refreshUpdatedHash(socket);
+
         logger.info("PACKAGE size " + packageSize);
 
         int collectionSize = tmp.size();
         int numOfPackages = (int) Math.ceil(collectionSize / packageSize);
 
+        System.out.println("Num of pckg" + numOfPackages);
+
         int packageCounter = 0;
         int objectCounter = 0;
+
+        if (numOfPackages == 0) {
+            numOfPackages = 1;
+            ResponseLengthSender responseLengthTask = new ResponseLengthSender(socket, user, numOfPackages);
+            forkJoinSendersPool.invoke(responseLengthTask);
+
+            System.out.println("Empty collection send");
+            ServerResponse response = new ServerResponse(tmp);
+            ResponseSender responseSenderTask = new ResponseSender(socket, user, response, false);
+            forkJoinSendersPool.invoke(responseSenderTask);
+
+            return;
+        }
 
         ResponseLengthSender responseLengthTask = new ResponseLengthSender(socket, user, numOfPackages);
         forkJoinSendersPool.invoke(responseLengthTask);
@@ -55,7 +86,9 @@ public class LongResponseSender extends RecursiveAction {
         logger.info("Sending reply to the user");
 
         while (packageCounter < numOfPackages){
-            String commandRes = "";
+            String commandRes = ""; // For long string sending
+            ArrayList<Person> pack = new ArrayList<>(); // For long collection sending
+
             int start = (int) packageSize * packageCounter;
             int end = (int) (start + packageSize);
 
@@ -63,11 +96,22 @@ public class LongResponseSender extends RecursiveAction {
                 if (objectCounter == collectionSize)
                     break;
 
-                commandRes += collectionManager.showPerson(tmp.get(i));
+                if (command instanceof UpdateCollection) {
+                    pack.add(tmp.get(i));
+                }
+                else {
+                    commandRes += collectionManager.showPerson(tmp.get(i));
+                }
                 objectCounter++;
             }
             packageCounter++;
-            ServerResponse response = new ServerResponse(commandRes);
+
+            System.out.println("req sent");
+            ServerResponse response = new ServerResponse(pack);;
+            if (!(command instanceof UpdateCollection)) {
+                response = new ServerResponse(commandRes);
+            }
+
             ResponseSender responseSenderTask = new ResponseSender(socket, user, response, true);
             forkJoinSendersPool.invoke(responseSenderTask);
 
@@ -82,7 +126,7 @@ public class LongResponseSender extends RecursiveAction {
         logger.info(packageCounter + " packages sent in " + sendingTime + " ms");
     }
 
-    private int calcOptimalPackageSize(int clientBuffSize){
+    private int calcOptimalStringPackageSize(int clientBuffSize){
         byte[] arr;
         try {
             arr = collectionManager.head().getBytes("UTF-8");

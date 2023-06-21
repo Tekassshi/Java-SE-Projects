@@ -5,11 +5,13 @@ import comparators.DefaultComparator;
 import comparators.HeightComparator;
 import data.*;
 
+import java.net.Socket;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
@@ -22,6 +24,8 @@ import org.slf4j.Logger;
 public class CollectionManager {
     private Deque<Person> collection = new LinkedBlockingDeque<>();
     private Connection connection;
+    private int collectionHash;
+    private ConcurrentHashMap<Socket, Integer> lastUpdatedHash = new ConcurrentHashMap<>();
 
     private Logger LOGGER;
 
@@ -92,6 +96,7 @@ public class CollectionManager {
 
     public synchronized void loadCollection() throws SQLException {
         collection = getResultSetData(getCompleteDataFromDb());
+        collectionHash = collection.hashCode();
         defaultSort();
         LOGGER.info("Collection data was updated successfully");
     }
@@ -540,10 +545,22 @@ public class CollectionManager {
     }
 
     public synchronized ArrayList<Person> getDescendingHeightCollection(){
-        ArrayList<Person> tmp = new ArrayList<>(collection);
+        ArrayList<Person> tmp = new ArrayList<>();
         collection.stream().sorted(new HeightComparator()).forEach(x -> tmp.add(x));
 
         return tmp;
+    }
+
+    public synchronized void initUpdateHash(Socket socket){
+        lastUpdatedHash.put(socket, 0);
+    }
+
+    public synchronized int getUpdatedHash(Socket socket) {
+        return lastUpdatedHash.get(socket);
+    }
+
+    public synchronized void refreshUpdatedHash(Socket socket) {
+        lastUpdatedHash.put(socket, collectionHash);
     }
 
     public synchronized long getCollectionSize(){
@@ -556,5 +573,13 @@ public class CollectionManager {
 
     public synchronized void setConnection(Connection connection) {
         this.connection = connection;
+    }
+
+    public synchronized int getCollectionHash() {
+        return collectionHash;
+    }
+
+    public synchronized void setCollectionHash(int collectionHash) {
+        this.collectionHash = collectionHash;
     }
 }

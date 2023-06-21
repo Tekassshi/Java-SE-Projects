@@ -44,7 +44,7 @@ public class RequestReader implements Runnable {
 
                 InputStream is = socket.getInputStream();
                 byte[] arr = new byte[5000];
-                ClientRequest request;
+                ClientRequest request = null;
 
                 try {
                     logger.info("Reading client request.");
@@ -73,7 +73,6 @@ public class RequestReader implements Runnable {
                 }
                 catch (JWTVerificationException e) {
                     logger.warn("Client \"" + user + "\" token timeout. Connection closed.\n");
-
                     ServerResponse response = new ServerResponse("\nSession timeout. Connection closed. " +
                             "Please, log in again.\n");
                     ResponseSender responseSenderTask =
@@ -89,7 +88,6 @@ public class RequestReader implements Runnable {
             }
         }
         catch (IOException | InterruptedException e) {
-            e.printStackTrace();
             logger.error("Error user command executing. Connection closed.");
         } catch (SQLException e) {
             logger.error("Error database access. Connection closed.");

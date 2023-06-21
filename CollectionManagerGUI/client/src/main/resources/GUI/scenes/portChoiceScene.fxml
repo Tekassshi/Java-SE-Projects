@@ -3,7 +3,7 @@
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.Scene?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -23,7 +23,7 @@
                            <Image url="@../images/port.png" />
                         </image>
                      </ImageView>
-                     <Button layoutX="18.0" layoutY="50.0" mnemonicParsing="false" onAction="#tryConnect" prefHeight="29.0" prefWidth="194.0" styleClass="selectButton" stylesheets="@../css/authorization.css" text="Connect" textFill="WHITE">
+                     <Button fx:id="connectButton" layoutX="18.0" layoutY="50.0" mnemonicParsing="false" onAction="#tryConnect" prefHeight="29.0" prefWidth="194.0" styleClass="selectButton" stylesheets="@../css/authorization.css" text="Connect" textFill="WHITE">
                         <cursor>
                            <Cursor fx:constant="HAND" />
                         </cursor>
@@ -38,10 +38,6 @@
                </ImageView>
             </children>
          </AnchorPane>
-         <ComboBox layoutX="626.0" layoutY="20.0" prefHeight="28.0" prefWidth="61.0" promptText="EN" styleClass="languageSelectionPane">
-            <cursor>
-               <Cursor fx:constant="HAND" />
-            </cursor>
-         </ComboBox>
+         <MenuButton fx:id="languageMenu" layoutX="630.0" layoutY="14.0" mnemonicParsing="false" prefHeight="27.0" prefWidth="56.0" styleClass="common" text="EN" />
       </children></AnchorPane>
 </Scene>

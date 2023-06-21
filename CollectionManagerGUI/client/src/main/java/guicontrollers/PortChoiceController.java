@@ -1,5 +1,6 @@
 package guicontrollers;
 
+import guicontrollers.abstractions.LanguageChanger;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
@@ -8,6 +9,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -22,24 +25,30 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class PortChoiceController implements Initializable {
+public class PortChoiceController extends LanguageChanger implements Initializable {
     private AuthorizationManager authorizationManager = UserSessionManager.getAuthorizationManager();
     private ConnectionManager connectionManager = UserSessionManager.getConnectionManager();
+
+    @FXML
+    private Button connectButton;
+
+    @FXML
+    private MenuButton languageMenu;
+
+    @FXML
+    private Text errorMsg;
 
     @FXML
     private AnchorPane majorPane;
 
     @FXML
-    private ImageView loadingAnim;
-
-    @FXML
     private TextField portField;
-
-    @FXML
-    private Text errorMsg;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        super.setMenuButton(languageMenu);
+        changeLanguage();
+
         errorMsg.setVisible(false);
         portField.setStyle("-fx-background-color: #e5e5e5");
 
@@ -68,7 +77,7 @@ public class PortChoiceController implements Initializable {
             port = InputManager.readPort(portField.getText());
         }
         catch (IOException | NumberFormatException ex) {
-            errorMsg.setText("Wrong port value!");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong port value!"));
             errorMsg.setVisible(true);
             portField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -100,11 +109,19 @@ public class PortChoiceController implements Initializable {
                 }
                 else {
                     SessionController.setScene(errorMsg.getScene());
-                    errorMsg.setText("Server is unavailable. Please, try later.");
+                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Server is unavailable. " +
+                            "Please, try later."));
                     errorMsg.setVisible(true);
                 }
             }
         });
         new Thread(connectTask).start();
+    }
+
+    @Override
+    protected void changeLanguage() {
+        languageMenu.setText(UserSessionManager.getCurrentBundle().getString("lang"));
+        connectButton.setText(UserSessionManager.getCurrentBundle().getString("Connect"));
+        portField.setPromptText(UserSessionManager.getCurrentBundle().getString("Port"));
     }
 }

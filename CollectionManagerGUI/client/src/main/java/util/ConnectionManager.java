@@ -5,6 +5,7 @@ import commands.LogIn;
 import commands.SignUp;
 import connection.ClientRequest;
 import connection.ServerResponse;
+import data.Person;
 import interfaces.Command;
 import connection.SerializationManager;
 
@@ -13,6 +14,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.*;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -121,6 +123,7 @@ public class ConnectionManager {
 
     public synchronized String readResponse() throws IOException{
         StringBuilder res = new StringBuilder("");
+        isFirstPackage = true;
 
         while (true) {
             ByteBuffer bb = ByteBuffer.allocate(20000);
@@ -161,11 +164,11 @@ public class ConnectionManager {
                             isFirstPackage = false;
                         }
 
-                        res.append(responseObj.toString());
+                        res.append(responseObj.toString() + "\n");
 
                         if (packages == 0) {
                             isLongReply = false;
-                            return responseObj.toString();
+                            return res.toString();
                         }
                     }
                     else
@@ -209,6 +212,78 @@ public class ConnectionManager {
 
                 System.out.println(ANSI_RED + "\nError while reading authorization result. Try again.\n");
                 return res;
+            }
+        }
+    }
+
+    public synchronized ArrayList<Person> readUpdatedCollectionResponse() throws IOException{
+        ArrayList<Person> collection = new ArrayList<>();
+        isFirstPackage = true;
+
+        while (true) {
+            ByteBuffer bb = ByteBuffer.allocate(20000);
+
+            if (selector.select() > 0) {
+                Set<SelectionKey> readySet = selector.selectedKeys();
+                Iterator<SelectionKey> readySetIterator = readySet.iterator();
+
+                SelectionKey key = null;
+
+                while (readySetIterator.hasNext()) {
+                    key = readySetIterator.next();
+                    readySetIterator.remove();
+                }
+
+                try {
+                    if (!key.isReadable())
+                        continue;
+
+                    try {
+                        sc.read(bb);
+                    }
+                    catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
+                    Object responseObj = response.getObj();
+
+                    if (responseObj == null)
+                        return null;
+
+                    if (responseObj instanceof Integer){
+                        packages = (Integer) responseObj;
+                        isLongReply = true;
+                    }
+
+                    if (isLongReply) {
+                        if (!isFirstPackage)
+                            packages--;
+                        if (isFirstPackage) {
+                            isFirstPackage = false;
+                            continue;
+                        }
+
+                        collection.addAll((ArrayList) responseObj);
+
+                        if (packages == 0) {
+                            isLongReply = false;
+                            return collection;
+                        }
+                    }
+                    else {
+                        collection.addAll((ArrayList) responseObj);
+                        return collection;
+                    }
+                }
+                catch (Exception e){
+                    if (!tryConnect(port))
+                        e.printStackTrace();
+
+                    if (isLongReply)
+                        isLongReply = false;
+
+                    System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
+                }
             }
         }
     }

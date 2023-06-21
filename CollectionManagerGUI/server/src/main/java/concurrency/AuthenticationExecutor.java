@@ -134,6 +134,7 @@ public class AuthenticationExecutor implements Runnable{
                 }
             }
 
+            collectionManager.initUpdateHash(socket);
             RequestReader requestReaderTask = new RequestReader(socket, collectionManager, username, tokenData[1]);
             fixedThreadPool.submit(requestReaderTask);
         }

@@ -1,7 +1,6 @@
 package commands;
 
-import data.Person;
-import data.PersonParamsContainer;
+import data.*;
 import interfaces.AssemblableCommand;
 import interfaces.Command;
 import managers.CollectionManager;
@@ -27,20 +26,24 @@ public class RemoveGreater extends AbstractCommand implements Command, Assemblab
 
     @Override
     public void buildObject(PersonParamsContainer container) {
-//        System.out.println("\n--- A person to compare ---\n");
-//
-//        Person person = new Person();
-//
-//        person.setName(InputManager.readName());
-//        person.setCoordinates(InputManager.readCoordinates());
-//        person.setCreationDate(ZonedDateTime.now());
-//        person.setHeight(InputManager.readHeight());
-//        person.setWeight(InputManager.readWeight());
-//        person.setEyeColor(InputManager.readEyeColor());
-//        person.setNationality(InputManager.readNationality());
-//        person.setLocation(InputManager.readLocation());
-//
-//        super.setObject(person);
+        Person person = new Person();
+
+        person.setName(container.getName());
+        Coordinates coordinates = new Coordinates(Long.parseLong(container.getxCoord()),
+                Long.parseLong(container.getyCoord()));
+        person.setCoordinates(coordinates);
+        person.setCreationDate(ZonedDateTime.now());
+        person.setHeight(Integer.parseInt(container.getHeight()));
+        person.setWeight(Float.parseFloat(container.getWeight()));
+        person.setEyeColor(Color.valueOf(container.getEyeColor()));
+        person.setNationality(Country.valueOf(container.getNationality().toUpperCase()));
+        Location location = new Location(
+                Integer.parseInt(container.getxLooc()),
+                Float.parseFloat(container.getyLooc()),
+                Double.parseDouble(container.getzLooc()));
+        person.setLocation(location);
+
+        super.setObject(person);
     }
 
     @Override

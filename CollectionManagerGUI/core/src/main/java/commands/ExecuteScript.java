@@ -24,7 +24,7 @@ public class ExecuteScript extends AbstractCommand implements CommandWithArg {
      * @param arg filepath to script that should be executed in String representation.
      * */
     @Override
-    public void setArg(String arg) {
+    public void setArg(String arg) throws FileNotFoundException {
         super.setArgument(InputManager.readFile(arg));
     }
 
