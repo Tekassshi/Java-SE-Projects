@@ -3,6 +3,7 @@ package guicontrollers.commandguicontrollers;
 import commands.RemoveAllByNationality;
 import commands.RemoveById;
 import guicontrollers.SessionController;
+import guicontrollers.abstractions.LanguageChanger;
 import interfaces.Command;
 import interfaces.CommandWithArg;
 import javafx.concurrent.Task;
@@ -26,9 +27,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class RemoveByNationalitySceneController implements Initializable {
+public class RemoveByNationalitySceneController extends LanguageChanger implements Initializable {
     @FXML
     private Text errorMsg;
+
+    @FXML
+    private Text label;
 
     @FXML
     private TextField nationalityField;
@@ -36,9 +40,11 @@ public class RemoveByNationalitySceneController implements Initializable {
     @FXML
     private Button sendCommandBtn;
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         errorMsg.setVisible(false);
+        changeLanguage();
 
         sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -71,9 +77,10 @@ public class RemoveByNationalitySceneController implements Initializable {
             String nationality = String.valueOf(InputManager.readNationality(nationalityField.getText()));
             command.setArg(nationality);
         }
-        catch (NumberFormatException e){
-            errorMsg.setText("Wrong nationality value! (you can choose one of the values \"RUSSIA, FRANCE, THAILAND," +
-                    " NORTH_KOREA\")");
+        catch (IllegalArgumentException e){
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong nationality value! " +
+                    "(you can choose one of the values \"RUSSIA, FRANCE, THAILAND," +
+                    " NORTH_KOREA\")"));
             errorMsg.setVisible(true);
             nationalityField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -86,7 +93,8 @@ public class RemoveByNationalitySceneController implements Initializable {
         Task<String> commandTask = new Task<>() {
             @Override
             protected String call() throws IOException {
-                return UserSessionManager.getCommandManager().processUserCommand(command);
+                String res = UserSessionManager.getCommandManager().processUserCommand(command);
+                return UserSessionManager.getCurrentBundle().getString(res);
             }
         };
 
@@ -115,5 +123,12 @@ public class RemoveByNationalitySceneController implements Initializable {
 
     private void setDefaultDesign(){
         nationalityField.setStyle("-fx-background-color: #e5e5e5");
+    }
+
+    @Override
+    protected void changeLanguage() {
+        sendCommandBtn.setText(UserSessionManager.getCurrentBundle().getString("Remove"));
+        label.setText(UserSessionManager.getCurrentBundle().getString("Remove by nationality"));
+        nationalityField.setPromptText(UserSessionManager.getCurrentBundle().getString("Nationality"));
     }
 }

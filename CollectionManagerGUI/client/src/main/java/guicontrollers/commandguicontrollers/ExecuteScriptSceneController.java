@@ -2,6 +2,7 @@ package guicontrollers.commandguicontrollers;
 
 import commands.ExecuteScript;
 import guicontrollers.SessionController;
+import guicontrollers.abstractions.LanguageChanger;
 import interfaces.CommandWithArg;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -25,9 +26,12 @@ import java.net.URL;
 import java.util.InputMismatchException;
 import java.util.ResourceBundle;
 
-public class ExecuteScriptSceneController implements Initializable {
+public class ExecuteScriptSceneController extends LanguageChanger implements Initializable {
     @FXML
     private Text errorMsg;
+
+    @FXML
+    private Text label;
 
     @FXML
     private TextField scriptPathField;
@@ -38,6 +42,7 @@ public class ExecuteScriptSceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         errorMsg.setVisible(false);
+        changeLanguage();
 
         sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -70,7 +75,7 @@ public class ExecuteScriptSceneController implements Initializable {
             command.setArg(scriptPathField.getText());
         }
         catch (FileNotFoundException e) {
-            errorMsg.setText("File called \"" + scriptPathField.getText() + "\" not found.");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("File not found."));
             errorMsg.setVisible(true);
             scriptPathField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -107,7 +112,7 @@ public class ExecuteScriptSceneController implements Initializable {
                 Throwable exception = commandTask.getException();
 
                 if (exception instanceof FileNotFoundException) {
-                    errorMsg.setText("File doesn't exist!");
+                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("File doesn't exist!"));
                     errorMsg.setVisible(true);
                     scriptPathField.setStyle("-fx-background-color: #ffe6e6");
                 }
@@ -116,12 +121,14 @@ public class ExecuteScriptSceneController implements Initializable {
                         exception instanceof InputMismatchException ||
                         exception instanceof NullPointerException) {
 
-                        errorMsg.setText("Wrong data in script. Process will be terminated.");
+                        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong data in script. " +
+                                "Process will be terminated."));
                         errorMsg.setVisible(true);
                         scriptPathField.setStyle("-fx-background-color: #ffe6e6");
                 }
                 else if (exception instanceof RuntimeException) {
-                    errorMsg.setText("Recursion detected. Process will be terminated.");
+                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Recursion detected. " +
+                            "Process will be terminated."));
                     errorMsg.setVisible(true);
                     scriptPathField.setStyle("-fx-background-color: #ffe6e6");
                 }
@@ -136,5 +143,12 @@ public class ExecuteScriptSceneController implements Initializable {
 
     private void setDefaultDesign(){
         scriptPathField.setStyle("-fx-background-color: #e5e5e5");
+    }
+
+    @Override
+    protected void changeLanguage() {
+        sendCommandBtn.setText(UserSessionManager.getCurrentBundle().getString("Execute"));
+        label.setText(UserSessionManager.getCurrentBundle().getString(label.getText()));
+        scriptPathField.setPromptText(UserSessionManager.getCurrentBundle().getString(scriptPathField.getPromptText()));
     }
 }

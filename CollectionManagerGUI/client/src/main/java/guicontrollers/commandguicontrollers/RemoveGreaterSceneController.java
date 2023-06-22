@@ -4,6 +4,7 @@ import commands.AddIfMin;
 import commands.RemoveGreater;
 import data.*;
 import guicontrollers.SessionController;
+import guicontrollers.abstractions.LanguageChanger;
 import interfaces.AssemblableCommand;
 import interfaces.Command;
 import javafx.concurrent.Task;
@@ -27,7 +28,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class RemoveGreaterSceneController implements Initializable {
+public class RemoveGreaterSceneController extends LanguageChanger implements Initializable {
+
+    @FXML
+    private Text label;
+
     @FXML
     private Text errorMsg;
 
@@ -67,6 +72,7 @@ public class RemoveGreaterSceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         errorMsg.setVisible(false);
+        changeLanguage();
 
         sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -154,8 +160,9 @@ public class RemoveGreaterSceneController implements Initializable {
             personParamsContainer.setName(name);
         }
         catch (IllegalArgumentException e) {
-            errorMsg.setText(" Wrong name format! Name should contain at least 1 symbol and " +
-                    "only letters supported");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong name format! Name should " +
+                    "contain at least 1 symbol and " +
+                    "only letters supported"));
             errorMsg.setVisible(true);
             nameField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -167,8 +174,9 @@ public class RemoveGreaterSceneController implements Initializable {
             personParamsContainer.setyCoord(String.valueOf(coordinates.getY()));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong coordinates format! (\"X\" should be integer number, " +
-                    "that > -783, \"Y\" should be long integer number.)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong coordinates format! " +
+                    "(\"X\" should be integer number, " +
+                    "that > -783, \"Y\" should be long integer number.)"));
             errorMsg.setVisible(true);
             xCoordField.setStyle("-fx-background-color: #ffe6e6");
             yCoordField.setStyle("-fx-background-color: #ffe6e6");
@@ -180,8 +188,9 @@ public class RemoveGreaterSceneController implements Initializable {
             personParamsContainer.setHeight(String.valueOf(height));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong height format! (height should be integer > 0, and " +
-                    "only digits supported)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong height format! " +
+                    "(height should be integer > 0, and " +
+                    "only digits supported)"));
             errorMsg.setVisible(true);
             heightField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -192,7 +201,8 @@ public class RemoveGreaterSceneController implements Initializable {
             personParamsContainer.setWeight(String.valueOf(weight));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong weight format! (weight should be decimal value > 0)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong weight format! (weight " +
+                    "should be decimal value > 0)"));
             errorMsg.setVisible(true);
             weightField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -203,7 +213,8 @@ public class RemoveGreaterSceneController implements Initializable {
             personParamsContainer.setEyeColor(String.valueOf(eyeColor));
         }
         catch (IllegalArgumentException | IOException e) {
-            errorMsg.setText("Wrong color value! (you can choose one of the values \"GREEN, RED, BLACK, BLUE, YELLOW\")");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong color value! (you " +
+                    "can choose one of the values \"GREEN, RED, BLACK, BLUE, YELLOW\")"));
             errorMsg.setVisible(true);
             eyeColorField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -214,8 +225,9 @@ public class RemoveGreaterSceneController implements Initializable {
             personParamsContainer.setNationality(nationality.toString());
         }
         catch (IllegalArgumentException | IOException e) {
-            errorMsg.setText(" Wrong nationality value! (you can choose one of the values \"RUSSIA, FRANCE, THAILAND, " +
-                    "NORTH_KOREA\")");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong nationality value! " +
+                    "(you can choose one of the values \"RUSSIA, FRANCE, THAILAND, " +
+                    "NORTH_KOREA\")"));
             errorMsg.setVisible(true);
             nationalityField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -229,8 +241,9 @@ public class RemoveGreaterSceneController implements Initializable {
             personParamsContainer.setzLooc(String.valueOf(location.getZ()));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong location format! (\"X\" should be Float number, \"Y\" should be Integer number, " +
-                    "\"Z\" should be Double number.");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong location format! (\"X\" " +
+                    "should be Float number, \"Y\" should be Integer number, " +
+                    "\"Z\" should be Double number."));
             errorMsg.setVisible(true);
             xLoocField.setStyle("-fx-background-color: #ffe6e6");
             yLoocField.setStyle("-fx-background-color: #ffe6e6");
@@ -248,29 +261,22 @@ public class RemoveGreaterSceneController implements Initializable {
         Task<String> commandTask = new Task<>() {
             @Override
             protected String call() throws IOException {
-                return UserSessionManager.getCommandManager().processUserCommand((Command) removeGreater);
+                String res = UserSessionManager.getCommandManager().processUserCommand((Command) removeGreater);
+                return UserSessionManager.getCurrentBundle().getString(res);
             }
         };
 
-        commandTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Parent root = resStage.getScene().getRoot();
-                TextArea response = (TextArea) root.lookup("#textArea");
-                VBox vBox = (VBox) root.lookup("#vBox");
-                vBox.setVisible(true);
-                vBox.setDisable(false);
-                response.setText(commandTask.getValue());
-                response.setEditable(false);
-            }
+        commandTask.setOnSucceeded(event -> {
+            Parent root = resStage.getScene().getRoot();
+            TextArea response = (TextArea) root.lookup("#textArea");
+            VBox vBox = (VBox) root.lookup("#vBox");
+            vBox.setVisible(true);
+            vBox.setDisable(false);
+            response.setText(commandTask.getValue());
+            response.setEditable(false);
         });
 
-        commandTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                commandTask.getException().printStackTrace();
-            }
-        });
+        commandTask.setOnFailed(event -> commandTask.getException().printStackTrace());
 
         new Thread(commandTask).start();
     }
@@ -287,5 +293,21 @@ public class RemoveGreaterSceneController implements Initializable {
         xLoocField.setStyle("-fx-background-color: #e5e5e5");
         yLoocField.setStyle("-fx-background-color: #e5e5e5");
         zLoocField.setStyle("-fx-background-color: #e5e5e5");
+    }
+
+    @Override
+    protected void changeLanguage() {
+        sendCommandBtn.setText(UserSessionManager.getCurrentBundle().getString("Remove"));
+        label.setText(UserSessionManager.getCurrentBundle().getString(label.getText()));
+        eyeColorField.setPromptText(UserSessionManager.getCurrentBundle().getString(eyeColorField.getPromptText()));
+        heightField.setPromptText(UserSessionManager.getCurrentBundle().getString(heightField.getPromptText()));
+        nameField.setPromptText(UserSessionManager.getCurrentBundle().getString(nameField.getPromptText()));
+        nationalityField.setPromptText(UserSessionManager.getCurrentBundle().getString(nationalityField.getPromptText()));
+        weightField.setPromptText(UserSessionManager.getCurrentBundle().getString(weightField.getPromptText()));
+        xCoordField.setPromptText(UserSessionManager.getCurrentBundle().getString("Coord X"));
+        yCoordField.setPromptText(UserSessionManager.getCurrentBundle().getString("Coord Y"));
+        xLoocField.setPromptText(UserSessionManager.getCurrentBundle().getString(xLoocField.getPromptText()));
+        yLoocField.setPromptText(UserSessionManager.getCurrentBundle().getString(yLoocField.getPromptText()));
+        zLoocField.setPromptText(UserSessionManager.getCurrentBundle().getString(zLoocField.getPromptText()));
     }
 }

@@ -2,6 +2,7 @@ package guicontrollers.commandguicontrollers;
 
 import commands.Clear;
 import guicontrollers.SessionController;
+import guicontrollers.abstractions.LanguageChanger;
 import interfaces.Command;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -13,6 +14,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import util.UserSessionManager;
 
@@ -20,13 +22,18 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class ClearSceneController implements Initializable {
+public class ClearSceneController extends LanguageChanger implements Initializable {
+
+    @FXML
+    private Text question;
 
     @FXML
     private Button sendCommandBtn;
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        changeLanguage();
         sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
@@ -50,7 +57,8 @@ public class ClearSceneController implements Initializable {
         Task<String> commandTask = new Task<>() {
             @Override
             protected String call() throws IOException {
-                return UserSessionManager.getCommandManager().processUserCommand(command);
+                String res = UserSessionManager.getCommandManager().processUserCommand(command);
+                return UserSessionManager.getCurrentBundle().getString(res);
             }
         };
 
@@ -75,5 +83,11 @@ public class ClearSceneController implements Initializable {
         });
 
         new Thread(commandTask).start();
+    }
+
+    @Override
+    protected void changeLanguage() {
+        sendCommandBtn.setText(UserSessionManager.getCurrentBundle().getString("Clear"));
+        question.setText(UserSessionManager.getCurrentBundle().getString(question.getText()));
     }
 }

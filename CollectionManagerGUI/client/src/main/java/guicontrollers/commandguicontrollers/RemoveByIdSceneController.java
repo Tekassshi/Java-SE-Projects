@@ -4,6 +4,7 @@ import commands.Add;
 import commands.RemoveById;
 import data.*;
 import guicontrollers.SessionController;
+import guicontrollers.abstractions.LanguageChanger;
 import interfaces.AssemblableCommand;
 import interfaces.Command;
 import interfaces.CommandWithArg;
@@ -28,7 +29,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class RemoveByIdSceneController implements Initializable {
+public class RemoveByIdSceneController extends LanguageChanger implements Initializable {
     @FXML
     private Text errorMsg;
 
@@ -36,11 +37,15 @@ public class RemoveByIdSceneController implements Initializable {
     private TextField idField;
 
     @FXML
+    private Text label;
+
+    @FXML
     private Button sendCommandBtn;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         errorMsg.setVisible(false);
+        changeLanguage();
 
         sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -74,8 +79,9 @@ public class RemoveByIdSceneController implements Initializable {
             command.setArg(id);
         }
         catch (NumberFormatException e){
-            errorMsg.setText("Wrong id value! (Id should be > 0 and contain " +
-                    "only digits)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong id value! (Id should " +
+                    "be > 0 and contain " +
+                    "only digits)"));
             errorMsg.setVisible(true);
             idField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -88,7 +94,8 @@ public class RemoveByIdSceneController implements Initializable {
         Task<String> commandTask = new Task<>() {
             @Override
             protected String call() throws IOException {
-                return UserSessionManager.getCommandManager().processUserCommand(command);
+                String res = UserSessionManager.getCommandManager().processUserCommand(command);
+                return UserSessionManager.getCurrentBundle().getString(res);
             }
         };
 
@@ -117,5 +124,12 @@ public class RemoveByIdSceneController implements Initializable {
 
     private void setDefaultDesign(){
         idField.setStyle("-fx-background-color: #e5e5e5");
+    }
+
+    @Override
+    protected void changeLanguage() {
+        sendCommandBtn.setText(UserSessionManager.getCurrentBundle().getString("Remove"));
+        label.setText(UserSessionManager.getCurrentBundle().getString(label.getText()));
+        idField.setPromptText(UserSessionManager.getCurrentBundle().getString("ID"));
     }
 }

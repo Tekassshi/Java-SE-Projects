@@ -56,3 +56,7 @@
 .text-area:focused {
     -fx-highlight-fill: #1a8eea;
 }
+
+.menu-item:focused {
+    -fx-background-color: #1d9bff;
+}

@@ -264,7 +264,7 @@ public class CollectionManager {
 
     /**
      * Method for executing "update" user command.
-     * @see commands.UpdateId
+     * @see Person
      * @param person "Person" class object for updating in node with same "id" field in current collection.
      * */
     public synchronized String updateId(String username, Person person) {
@@ -287,7 +287,7 @@ public class CollectionManager {
             updatePersonQuery(person);
             loadCollection();
             defaultSort();
-            return "\nPerson with id = " + person.getId() + " was successfully updated!\n";
+            return "\nPerson with given id was successfully updated!\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error inserting or load data from database.");
@@ -366,7 +366,7 @@ public class CollectionManager {
 
             loadCollection();
             defaultSort();
-            return "\nPerson with id = " + id + " was successfully removed!\n";
+            return "\nPerson with given id was successfully removed!\n";
         }
         catch (SQLException e) {
             LOGGER.warn("Error with database.");
@@ -531,9 +531,9 @@ public class CollectionManager {
      * @see commands.Info
      * */
     public synchronized String info(){
-        String s = "";
-        s += "Collection type: ArrayDeque<Person>" + "\n";
-        s += "Number of elements: " + collection.size() + "\n\n";
+        String s = "ArrayDeque<Person>";
+        s += ":";
+        s += collection.size();
         return s;
     }
 

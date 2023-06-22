@@ -3,6 +3,7 @@ package guicontrollers.commandguicontrollers;
 import commands.FilterByNationality;
 import commands.RemoveAllByNationality;
 import guicontrollers.SessionController;
+import guicontrollers.abstractions.LanguageChanger;
 import interfaces.CommandWithArg;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
@@ -25,9 +26,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class FilterByNationalitySceneController implements Initializable {
+public class FilterByNationalitySceneController extends LanguageChanger implements Initializable {
+
     @FXML
     private Text errorMsg;
+
+    @FXML
+    private Text label;
 
     @FXML
     private TextField nationalityField;
@@ -38,6 +43,7 @@ public class FilterByNationalitySceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         errorMsg.setVisible(false);
+        changeLanguage();
 
         sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -70,9 +76,10 @@ public class FilterByNationalitySceneController implements Initializable {
             String nationality = String.valueOf(InputManager.readNationality(nationalityField.getText()));
             command.setArg(nationality);
         }
-        catch (NumberFormatException e){
-            errorMsg.setText("Wrong nationality value! (you can choose one of the values \"RUSSIA, FRANCE, THAILAND," +
-                    " NORTH_KOREA\")");
+        catch (IllegalArgumentException e){
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong nationality value! " +
+                    "(you can choose one of the values \"RUSSIA, FRANCE, THAILAND," +
+                    " NORTH_KOREA\")"));
             errorMsg.setVisible(true);
             nationalityField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -114,5 +121,12 @@ public class FilterByNationalitySceneController implements Initializable {
 
     private void setDefaultDesign(){
         nationalityField.setStyle("-fx-background-color: #e5e5e5");
+    }
+
+    @Override
+    protected void changeLanguage() {
+        sendCommandBtn.setText(UserSessionManager.getCurrentBundle().getString("Filter"));
+        label.setText(UserSessionManager.getCurrentBundle().getString("Filter by nationality"));
+        nationalityField.setPromptText(UserSessionManager.getCurrentBundle().getString("Nationality"));
     }
 }

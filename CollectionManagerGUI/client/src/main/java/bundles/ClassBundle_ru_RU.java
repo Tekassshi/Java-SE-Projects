@@ -38,13 +38,11 @@ public class ClassBundle_ru_RU extends ListResourceBundle {
             // Main control page
             {"ID", "ИД"},
             {"Name", "Имя"},
-            {"Coord X", "Координата X"},
-            {"Coordinate X","Координата X"},
-            {"Coordinate Y","Координата Y"},
+            {"Coord X", "Коорд. X"},
             {"Location X", "Расположение Х"},
             {"Location Y", "Расположение Y"},
             {"Location Z", "Расположение Z"},
-            {"Coord Y", "Координата Y"},
+            {"Coord Y", "Коорд. Y"},
             {"Creation Date", "Дата создания"},
             {"Height", "Рост"},
             {"Weight", "Вес"},
@@ -66,12 +64,13 @@ public class ClassBundle_ru_RU extends ListResourceBundle {
             {"FRANCE", "ФРАНЦИЯ"},
             {"THAILAND","ТАИЛАНД"},
             {"NORTH_KOREA", "СЕВЕРНАЯ КОРЕЯ"},
-
+            {"Remove", "Удалить"},
+            {"Update", "Обновить"},
 
             //Commands nested windows
 
             //Add
-            {"AddNewPerson", "Добавить новую запись"},
+            {"Add new person", "Добавить новую запись"},
             {"Add", "Добавить"},
             {"Wrong name format! Name should contain at least 1 symbol and only letters supported",
                     "Неправильный формат имени! Имя должно содержать не менее 1 символа и состоять только из букв."},
@@ -98,6 +97,9 @@ public class ClassBundle_ru_RU extends ListResourceBundle {
             {"Wrong data in script. Process will be terminated.", "Неверные данные в скрипте. Процесс будет прекращен."},
             {"Recursion detected. Process will be terminated.", "Обнаружена рекурсия. Процесс будет прекращен."},
 
+            // Info
+            {"infoTitle", "Информация о коллекции"},
+
             // Help
             {"helpLabel", "Справка по доступным командам"},
             {"helpMsg",
@@ -123,11 +125,28 @@ public class ClassBundle_ru_RU extends ListResourceBundle {
             "\"print_field_descending_height\" - вывести значения поля " +
             "height всех элементов в порядке убывания\n"},
 
-            // Static labels
-            {"", ""},
+            // Command buttons
+            {"Add", "Добавить"},
+            {"Clear", "Очистить"},
+            {"Execute", "Выполнить"},
+            {"Filter", "Фильтровать"},
+            {"Remove", "Удалить"},
+            {"Update", "Обновить"},
 
-            // Server responses
-            {"", ""},
+            // Static labels
+            {"Add new person", "Добавить новую запись"},
+            {"Add new person if min", "Добавить новую запись, если она меньше"},
+            {"Remove greater persons", "Удалить больших"},
+            {"Add new person if min", "Добавить, если меньше"},
+            {"Do you want to clear all your records?", "Хотите очистить все ваши записи?"},
+            {"Execute script", "Выполнить скрипт"},
+            {"Script filename", "Имя файла скрипта"},
+            {"File not found.", "Файл не найден."},
+            {"File doesn't exist!", "Файл не существует!"},
+            {"Filter by nationality", "Фильтровать по национальности"},
+            {"Remove by ID", "Удалить по ID"},
+            {"Remove by nationality", "Удалить по национальности"},
+            {"Update ID", "Обновить ID"},
 
             // Error messages
             {"Server error. Please, try later.", "Ошибка сервера. Пожалуйста, попробуйте позже."},
@@ -137,9 +156,33 @@ public class ClassBundle_ru_RU extends ListResourceBundle {
                     "Неверный формат имени пользователя или пароля (от 5 до 15 символов, и они должны " +
                             "содержать только английские буквы или цифры.)"},
             {"Wrong username or password!","Неверный логин или пароль!"},
-            {"",""},
-            {"",""},
-            {"",""}
+            {"Wrong id value! (Id should be > 0 and contain only digits)",
+                    "Неправильное значение идентификатора! (Id должен быть > 0 и содержать только цифры)"},
+
+            // Server responses
+            {"Server response", "Результат с сервера"},
+            {"\nCollection is empty!\n", "\nКоллекция пуста!\n"},
+            {"Person was added successfully!\n", "Запись успешно добавлена!\n"},
+            {"Error updating, inserting or loading data from database.\n", "Ошибка при обновлении, " +
+                    "вставке или загрузке данных из базы данных.\n"},
+            {"\nYour element value is bigger or the same than min element in collection\nElement will not be recorded.\n",
+                    "\nЗначение вашего элемента больше или равно минимальному значению элемента в коллекции." +
+                            "\nЭлемент не будет записан.\n"},
+            {"\nCollection is empty!\n", "\nКоллекция пуста!\n"},
+            {"\nId, that you want to update, doesn't exist!\nTry again\n", "\nИдентификатор, который вы хотите " +
+                    "обновить, не существует!\nПопробуйте снова.\n"},
+            {"\nYou can edit only your own records!\nTry again.\n", "\nВы можете редактировать только свои " +
+                    "собственные записи!\nПопробуйте снова.\n"},
+            {"\nPerson with given id was successfully updated!\n", "\nЗапись с указанным идентификатором успешно " +
+                    "обновлена!\n"},
+            {"\nPerson with given id value doesn't exist!Try again.\n", "\nЗапись с указанным значением " +
+                    "идентификатора не существует! Попробуйте снова.\n"},
+            {"\nPerson with given id was successfully removed!\n", "\nЗапись с указанным идентификатором " +
+                    "успешно удалена!\n"},
+            {"\nAll your own records successfully cleared.\n", "\nВсе ваши собственные записи успешно очищены.\n"},
+            {"\nYour own records have been successfully removed!\n", "\nВаши собственные записи успешно удалены!\n"},
+            {"Collection type:", "Тип коллекции:"},
+            {"Number of elements:", "Количество элементов:"},
     };
 
     @Override

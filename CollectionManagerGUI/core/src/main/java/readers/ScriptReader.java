@@ -8,7 +8,6 @@ import interfaces.Command;
 import interfaces.CommandWithArg;
 
 import java.io.*;
-import java.util.InputMismatchException;
 import java.util.Queue;
 
 public class ScriptReader {

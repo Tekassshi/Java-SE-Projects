@@ -11,16 +11,16 @@
 <Scene xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="guicontrollers.commandguicontrollers.RemoveByNationalitySceneController">
     <AnchorPane prefHeight="191.0" prefWidth="324.0" stylesheets="@../../css/commandSceneStyle.css">
       <children>
-         <Text layoutX="19.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Remove by nationality" textAlignment="CENTER" wrappingWidth="286.80332946777344">
-            <font>
-               <Font size="17.0" />
-            </font>
-         </Text>
          <Button fx:id="sendCommandBtn" layoutX="94.0" layoutY="109.0" mnemonicParsing="false" onAction="#sendCommand" prefHeight="25.0" prefWidth="135.0" styleClass="selectButton" text="Button">
             <cursor>
                <Cursor fx:constant="HAND" />
             </cursor></Button>
          <Text fx:id="errorMsg" fill="RED" layoutX="25.0" layoutY="168.0" strokeType="OUTSIDE" strokeWidth="0.0" text="errorMsg" textAlignment="CENTER" wrappingWidth="274.80335998535156" />
          <TextField fx:id="nationalityField" layoutX="93.0" layoutY="62.0" prefHeight="25.0" prefWidth="135.0" promptText="Nationality to remove" />
+         <Text fx:id="label" layoutX="19.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Remove by nationality" textAlignment="CENTER" wrappingWidth="286.80332946777344">
+            <font>
+               <Font size="17.0" />
+            </font>
+         </Text>
       </children></AnchorPane>
 </Scene>

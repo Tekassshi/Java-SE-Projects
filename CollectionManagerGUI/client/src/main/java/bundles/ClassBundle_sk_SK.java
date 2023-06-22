@@ -66,12 +66,13 @@ public class ClassBundle_sk_SK extends ListResourceBundle {
             {"FRANCE", "FRANCÚZSKO"},
             {"THAILAND", "THAJSKO"},
             {"NORTH_KOREA", "SEVERNÁ KÓREA"},
-
+            {"Remove", "Odstrániť"},
+            {"Update", "Aktualizovať"},
 
             // Vnorené okná príkazov
 
             // Pridať
-            {"AddNewPerson", "Pridať nový záznam"},
+            {"Add new person", "Pridať nový záznam"},
             {"Add", "Pridať"},
             {"Wrong name format! Name should contain at least 1 symbol and only letters supported",
                     "Nesprávny formát mena! Meno by malo obsahovať aspoň 1 symbol a podporovať iba písmená."},
@@ -93,35 +94,59 @@ public class ClassBundle_sk_SK extends ListResourceBundle {
                     "Nesprávny formát polohy! (\"X\" by malo byť číslo s pohyblivou desatinnou čiarkou, " +
                             "\"Y\" by malo byť celé číslo, \"Z\" by malo byť číslo s pohyblivou desatinnou čiarkou."},
 
+            // Info
+            {"infoTitle", "Informácie o zbierke"},
+
+            // Help
+            {"helpLabel", "Nápoveda k dostupným príkazom"},
+            {"helpMsg", "\"help\" - zobraziť informácie o dostupných príkazoch.\n" +
+                    "\"info\" - zobraziť informácie o kolekcii (typ, dátum inicializácie, počet prvkov, atď.) " +
+                    "na štandardný výstupný prúd.\n" +
+                    "\"show\" - zobraziť všetky prvky kolekcie vo formáte reťazca na štandardný výstupný prúd.\n" +
+                    "\"add\" - pridať nový prvok do kolekcie.\n" +
+                    "\"update id\" - aktualizovať hodnotu prvku v kolekcii s daným id.\n" +
+                    "\"remove_by_id id\" - odstrániť prvok z kolekcie podľa id.\n" +
+                    "\"clear\" - vyčistiť kolekciu.\n" +
+                    "\"execute_script file_name\" - načítať a vykonať skript zo zadaného súboru. Skript " +
+                    "obsahuje príkazy vo forme, v akom ich zadáva používateľ v interaktívnom režime.\n" +
+                    "\"head\" - zobraziť prvý prvok kolekcie.\n" +
+                    "\"add_if_min\" - pridať nový prvok do kolekcie, ak je jeho hodnota menšia ako hodnota " +
+                    "najmenšieho prvku v tejto kolekcii.\n" +
+                    "\"remove_greater\" - odstrániť z kolekcie všetky prvky, ktoré sú väčšie ako zadaný prvok.\n" +
+                    "\"remove_all_by_nationality nationality\" - odstrániť z kolekcie všetky prvky, ktorých " +
+                    "hodnota poľa nationality je ekvivalentná zadanému.\n" +
+                    "\"filter_by_nationality nationality\" - zobraziť prvky, ktorých hodnota poľa nationality " +
+                    "je rovnaká ako zadaná hodnota.\n" +
+                    "\"print_field_descending_height\" - zobraziť hodnoty poľa height všetkých prvkov v zostupnom " +
+                    "poradí."},
+
             // Vykonanie skriptu
             {"File doesn't exist!", "Súbor neexistuje!"},
             {"Wrong data in script. Process will be terminated.", "Chybné údaje v skripte. Proces bude ukončený."},
             {"Recursion detected. Process will be terminated.", "Zistená rekurzia. Proces bude ukončený."},
 
-            // Pomoc
-            {"helpLabel", "Nápoveda k dostupným príkazom"},
-            {"helpMsg",
-                    "\n\n\"help\" - zobraziť nápovedu k dostupným príkazom\n" +
-                            "\"info\" - zobraziť informácie o kolekcii (typ, dátum inicializácie, počet prvkov atď.)\n" +
-                            "\"show\" - zobraziť všetky prvky kolekcie\n" +
-                            "\"add\" - pridať nový prvok do kolekcie\n" +
-                            "\"update id\" - aktualizovať hodnotu prvku v kolekcii s daným id\n" +
-                            "\"remove_by_id id\" - odstrániť prvok z kolekcie podľa id\n" +
-                            "\"clear\" - vyčistiť kolekciu\n" +
-                            "\"execute_script file_name\" - načítať a vykonať skript zo zadaného súboru. " +
-                            "Skript obsahuje príkazy v rovnakej forme, ako ich zadáva používateľ v interaktívnom režime.\n" +
-                            "\"head\" - zobraziť prvý prvok kolekcie\n" +
-                            "\"add_if_min\" - pridať nový prvok do kolekcie, ak je jeho hodnota nižšia " +
-                            "ako hodnota najmenšieho prvku v kolekcii\n" +
-                            "\"remove_greater\" - odstrániť zo kolekcie všetky prvky, ktoré majú vyššiu hodnotu\n" +
-                            "\"remove_all_by_nationality nationality\" - odstrániť zo kolekcie všetky prvky, " +
-                            "ktoré majú zhodnú národnosť\n" +
-                            "\"filter_by_nationality nationality\" - zobraziť prvky, ktoré majú zhodnú národnosť\n" +
-                            "\"print_field_descending_height\" - zobraziť hodnoty atribútu " +
-                            "výška pre všetky prvky v zostupnom poradí\n"},
+            // Command buttons
+            {"Add", "Pridať"},
+            {"Clear", "Vyčistiť"},
+            {"Execute", "Vykonať"},
+            {"Filter", "Filtrovať"},
+            {"Remove", "Odstrániť"},
+            {"Update", "Aktualizovať"},
 
             // Statické návestia
-            {"", ""},
+            {"Add new person", "Pridať novú osobu"},
+            {"Add new person if min", "Pridať novú osobu, ak je minimálna"},
+            {"Remove greater persons", "Odstrániť väčšie osoby"},
+            {"Add new person if min", "Pridať novú osobu, ak je minimálna"},
+            {"Do you want to clear all your records?", "Chcete vymazať všetky vaše záznamy?"},
+            {"Execute script", "Vykonaj skript"},
+            {"Script filename", "Názov súboru skriptu"},
+            {"File not found.", "Súbor nenájdený."},
+            {"File doesn't exist!", "Súbor neexistuje!"},
+            {"Filter by nationality", "Filtrovať podľa národnosti"},
+            {"Remove by ID", "Odstrániť podľa ID"},
+            {"Remove by nationality", "Odstrániť podľa národnosti"},
+            {"Update ID", "Aktualizovať ID"},
 
             // Odpovede servera
             {"", ""},
@@ -134,9 +159,33 @@ public class ClassBundle_sk_SK extends ListResourceBundle {
                     "Nesprávny formát používateľského mena alebo hesla (od 5 do 15 znakov a mali by obsahovať " +
                             "iba anglické písmená alebo číslice.)"},
             {"Wrong username or password!","Nesprávne používateľské meno alebo heslo!"},
-            {"",""},
-            {"",""},
-            {"",""}
+            {"Wrong id value! (Id should be > 0 and contain only digits)", "Nesprávna hodnota ID! " +
+                    "(ID by malo byť > 0 a obsahovať iba číslice)"},
+
+            // Server responses
+            {"Server response", "Odpoveď servera"},
+            {"\nCollection is empty!\n", "\nKolekcia je prázdna!\n"},
+            {"Person was added successfully!\n", "Osoba bola úspešne pridaná!\n"},
+            {"Error updating, inserting or loading data from database.\n", "Chyba pri " +
+                    "aktualizovaní, vkladaní alebo načítaní údajov z databázy.\n"},
+            {"\nYour element value is bigger or the same than min element in collection\nElement will not be recorded.\n",
+                    "\nHodnota vášho prvku je väčšia alebo rovnaká ako najmenší prvok v kolekcii.\nPrvok nebude " +
+                            "zaznamenaný.\n"},
+            {"\nCollection is empty!\n", "\nKolekcia je prázdna!\n"},
+            {"\nId, that you want to update, doesn't exist!\nTry again\n", "\nID, ktoré chcete aktualizovať, " +
+                    "neexistuje! Skúste to znova.\n"},
+            {"\nYou can edit only your own records!\nTry again.\n", "\nMôžete upravovať len vaše vlastné záznamy! " +
+                    "Skúste to znova.\n"},
+            {"\nPerson with given id was successfully updated!\n", "\nOsoba s daným ID bola úspešne aktualizovaná!\n"},
+            {"\nPerson with given id value doesn't exist!Try again.\n", "\nOsoba s danou hodnotou ID neexistuje! " +
+                    "Skúste to znova.\n"},
+            {"\nPerson with given id was successfully removed!\n", "\nOsoba s daným ID bola úspešne odstránená!\n"},
+            {"\nAll your own records successfully cleared.\n", "\nVšetky " +
+                    "vaše vlastné záznamy boli úspešne vymazané.\n"},
+            {"\nYour own records have been successfully removed!\n",
+                    "\nVaše vlastné záznamy boli úspešne odstránené!\n"},
+            {"Collection type:", "Typ kolekcie:"},
+            {"Number of elements:", "Počet prvkov:"},
 
     };
 

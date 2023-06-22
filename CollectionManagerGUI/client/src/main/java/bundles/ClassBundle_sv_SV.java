@@ -38,13 +38,11 @@ public class ClassBundle_sv_SV extends ListResourceBundle {
             // Main control page
             {"ID", "ID"},
             {"Name", "Namn"},
-            {"Coord X", "Koordinat X"},
-            {"Coordinate X", "Koordinat X"},
-            {"Coordinate Y", "Koordinat Y"},
+            {"Coord X", "Koord. X"},
             {"Location X", "Plats X"},
             {"Location Y", "Plats Y"},
             {"Location Z", "Plats Z"},
-            {"Coord Y", "Koordinat Y"},
+            {"Coord Y", "Koord. Y"},
             {"Creation Date", "Skapad datum"},
             {"Height", "Längd"},
             {"Weight", "Vikt"},
@@ -66,12 +64,13 @@ public class ClassBundle_sv_SV extends ListResourceBundle {
             {"FRANCE", "FRANKRIKE"},
             {"THAILAND", "THAILAND"},
             {"NORTH_KOREA", "NORDKOREA"},
-
+            {"Remove", "Ta bort"},
+            {"Update", "Uppdatera"},
 
             // Commands nested windows
 
             // Add
-            {"AddNewPerson", "Lägg till nytt objekt"},
+            {"Add new person", "Lägg till nytt objekt"},
             {"Add", "Lägg till"},
             {"Wrong name format! Name should contain at least 1 symbol and only letters supported",
                     "Felaktigt namnformat! Namnet bör innehålla minst 1 symbol och endast bokstäver är tillåtna."},
@@ -92,40 +91,86 @@ public class ClassBundle_sv_SV extends ListResourceBundle {
                     "Felaktigt platsformat! (\"X\" bör vara ett flyttal, \"Y\" bör vara ett heltal, \"Z\" bör vara ett " +
                             "tal med dubbel precision)"},
 
+            // Info
+            {"infoTitle", "Samlingsinfo"},
+
+            // Help
+            {"helpLabel", "Hjälp för tillgängliga kommandon"},
+            {"helpMsg", "\"help\" - visa hjälpinformation om tillgängliga kommandon.\n" +
+                    "\"info\" - visa information om samlingen (typ, initialiseringsdatum, antal element, etc.) " +
+                    "i standardutdataström.\n" +
+                    "\"show\" - visa alla element i samlingen i strängrepresentation i standardutdataström.\n" +
+                    "\"add\" - lägg till ett nytt element i samlingen.\n" +
+                    "\"update id\" - uppdatera värdet för elementet i samlingen med det angivna id:t.\n" +
+                    "\"remove_by_id id\" - ta bort ett element från samlingen med dess id.\n" +
+                    "\"clear\" - rensa samlingen.\n" +
+                    "\"execute_script file_name\" - läs och kör ett skript från den angivna filen. Skriptet " +
+                    "innehåller kommandon i samma format som användaren anger dem i interaktivt läge.\n" +
+                    "\"head\" - visa det första elementet i samlingen.\n" +
+                    "\"add_if_min\" - lägg till ett nytt element i samlingen om dess värde är mindre än det " +
+                    "minsta värdet i samlingen.\n" +
+                    "\"remove_greater\" - ta bort alla element från samlingen som är större än det angivna värdet.\n" +
+                    "\"remove_all_by_nationality nationality\" - ta bort alla element från samlingen vars" +
+                    "nationalitetsfält är ekvivalent med det angivna värdet.\n" +
+                    "\"filter_by_nationality nationality\" - visa element vars nationalitetsfält är lika med " +
+                    "det angivna värdet.\n" +
+                    "\"print_field_descending_height\" - visa höjdfältets värden för alla element i fallande ordning."},
+
             // Execute Script
             {"File doesn't exist!", "Filen finns inte!"},
             {"Wrong data in script. Process will be terminated.", "Felaktiga data i skriptet. Processen avbryts."},
             {"Recursion detected. Process will be terminated.", "Rekursion upptäckt. Processen avbryts."},
 
-            // Help
-            {"helpLabel", "Hjälp för tillgängliga kommandon"},
-            {"helpMsg",
-                    "\n\n\"help\" - visa hjälp för tillgängliga kommandon\n" +
-                            "\"info\" - visa information om samlingen (typ, initialiseringsdatum, antal objekt etc.)\n" +
-                            "\"show\" - visa alla objekt i samlingen i textformat\n" +
-                            "\"add\" - lägg till ett nytt objekt i samlingen\n" +
-                            "\"update id\" - uppdatera värdet för ett objekt i samlingen med ett specifikt ID\n" +
-                            "\"remove_by_id id\" - ta bort ett objekt från samlingen baserat på dess ID\n" +
-                            "\"clear\" - rensa samlingen\n" +
-                            "\"execute_script filnamn\" - läs in och kör ett skript från en specifik fil. " +
-                            "Skriptet bör innehålla kommandon på samma sätt som de matas in av användaren i interaktivt " +
-                            "läge.\n" +
-                            "\"head\" - visa det första objektet i samlingen\n" +
-                            "\"add_if_min\" - lägg till ett nytt objekt i samlingen om dess värde är mindre än " +
-                            "värdet hos det minsta objektet i samlingen\n" +
-                            "\"remove_greater\" - ta bort alla objekt i samlingen som är större än ett specifikt värde" +
-                            "\n\"remove_all_by_nationality nationality\" - ta bort alla objekt i samlingen där " +
-                            "nationalitetsvärdet matchar ett specifikt värde\n" +
-                            "\"filter_by_nationality nationality\" - visa alla objekt i samlingen där " +
-                            "nationalitetsvärdet matchar ett specifikt värde\n" +
-                            "\"print_field_descending_height\" - visa värdena för längdfältet för alla objekt " +
-                            "i fallande ordning\n"},
+            // Command buttons
+            {"Add", "Lägg till"},
+            {"Clear", "Rensa"},
+            {"Execute", "Utför"},
+            {"Filter", "Filtrera"},
+            {"Remove", "Ta bort"},
+            {"Update", "Uppdatera"},
 
             // Static labels
-            {"", ""},
+            {"Add new person", "Lägg till ny person"},
+            {"Add new person if min", "Lägg till ny person om den är minsta"},
+            {"Remove greater persons", "Ta bort större personer"},
+            {"Add new person if min", "Lägg till ny person om den är minsta"},
+            {"Do you want to clear all your records?", "Vill du rensa alla dina poster?"},
+            {"Execute script", "Kör skript"},
+            {"Script filename", "Skriptfilnamn"},
+            {"File not found.", "Filen hittades inte."},
+            {"File doesn't exist!", "Filen finns inte!"},
+            {"Filter by nationality", "Filtrera efter nationalitet"},
+            {"Remove by ID", "Ta bort efter ID"},
+            {"Remove by nationality", "Ta bort efter nationalitet"},
+            {"Update ID", "Uppdatera ID"},
 
             // Server responses
-            {"", ""},
+            {"\nCollection is empty!\n", "\nSamlingen är tom!\n"},
+            {"Person was added successfully!\n", "Personen lades till framgångsrikt!\n"},
+            {"Error updating, inserting or loading data from database.\n", "Fel vid uppdatering, " +
+                    "infogning eller inläsning av data från databasen.\n"},
+            {"\nYour element value is bigger or the same than min element in collection\nElement " +
+                    "will not be recorded.\n", "\nVärdet på ditt element är större eller lika med det " +
+                    "minsta elementet i samlingen.\nElementet kommer inte att sparas.\n"},
+
+            // Server responses
+            {"Server response", "Serversvar"},
+            {"\nCollection is empty!\n", "\nSamlingen är tom!\n"},
+            {"\nId, that you want to update, doesn't exist!\nTry again\n", "\nID:t du vill uppdatera " +
+                    "finns inte! Försök igen.\n"},
+            {"\nYou can edit only your own records!\nTry again.\n", "\nDu kan bara redigera dina egna poster! " +
+                    "Försök igen.\n"},
+            {"\nPerson with given id was successfully updated!\n", "\nPersonen med det angivna ID:t " +
+                    "uppdaterades framgångsrikt!\n"},
+            {"\nPerson with given id value doesn't exist!Try again.\n", "\nPersonen med det angivna " +
+                    "ID-värdet finns inte! Försök igen.\n"},
+            {"\nPerson with given id was successfully removed!\n", "\nPersonen med det angivna ID:t togs " +
+                    "bort framgångsrikt!\n"},
+            {"\nAll your own records successfully cleared.\n", "\nAlla dina egna poster rensades framgångsrikt.\n"},
+            {"\nYour own records have been successfully removed!\n", "\nDina egna poster har tagits " +
+                    "bort framgångsrikt!\n"},
+            {"Collection type:", "Samlingens typ:"},
+            {"Number of elements:", "Antal element:"},
 
             // Error messages
             {"Server error. Please, try later.", "Serverfel. Försök igen senare."},
@@ -135,7 +180,11 @@ public class ClassBundle_sv_SV extends ListResourceBundle {
                     "Felaktigt användarnamn eller lösenord (5 till 15 tecken som endast får innehålla bokstäver " +
                             "eller siffror)."},
             {"Wrong username or password!","Felaktigt användarnamn eller lösenord!"},
-            };
+            {"Wrong id value! (Id should be > 0 and contain only digits)", "Felaktigt ID-värde! " +
+                    "(ID bör vara > 0 och endast innehålla siffror)"},
+
+    };
+
 
     @Override
     protected Object[][] getContents() {

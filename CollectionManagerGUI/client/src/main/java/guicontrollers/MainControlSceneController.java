@@ -11,7 +11,11 @@ import javafx.application.Platform;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,15 +24,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import util.CollectionUpdater;
-import util.CollectionWrapper;
-import util.CommandManager;
-import util.UserSessionManager;
+import util.*;
 
 import java.io.IOException;
 import java.net.URL;
@@ -36,10 +39,7 @@ import java.text.NumberFormat;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class MainControlSceneController extends LanguageChanger implements Initializable {
 
@@ -68,10 +68,13 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     @FXML
     private Text username;
 
+    ContextMenu cm;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+
         initMenu();
+        initContextMenu();
 
         TableColumn<TableViewPerson, Long> idColumn = new TableColumn<>("ID");
         TableColumn<TableViewPerson, String> nameColumn = new TableColumn<>("Name");
@@ -116,11 +119,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 weightColumn, eyeColorColumn, nationalityColumn, locationXColumn, locationYColumn, locationZColumn,
                 usernameColumn);
 
-        tableView.setItems(CollectionWrapper.getCollection());
-        tableView.itemsProperty().bind(personTableProperty);
-
         tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        tableView.itemsProperty().bind(personTableProperty);
 
         exitBtn.setOnAction(event -> Platform.exit());
 
@@ -130,6 +129,8 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 UserSessionManager.getConnectionManager()));
         collectionUpdater.setDaemon(true);
         collectionUpdater.start();
+
+        tableView.setItems(generateFilteredList());
 
         changeLanguage();
     }
@@ -157,6 +158,9 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     private void openInfoScene() throws IOException {
         Command info = new Info(null);
         String res = commandManager.processUserCommand(info);
+        String data[] = res.split(":");
+        String out = UserSessionManager.getCurrentBundle().getString("Collection type:") + " " + data[0] + "\n" +
+                UserSessionManager.getCurrentBundle().getString("Number of elements:") + " " + data[1] + "\n";
 
         Stage stage = new Stage();
         GridPane gridPane;
@@ -172,7 +176,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
 
         Parent root = infoScene.getRoot();
         Label infoRes = (Label) root.lookup("#infoRes");
-        infoRes.setText(res);
+        infoRes.setText(out);
         stage.setScene(infoScene);
         stage.setResizable(false);
 
@@ -193,9 +197,41 @@ public class MainControlSceneController extends LanguageChanger implements Initi
         stage.show();
     }
 
-    private void openUpdateIdScene() throws IOException {
+    private void openUpdateIdScene(String id) throws IOException {
         Stage stage = new Stage();
         Scene addScene = FXMLLoader.load(getClass().getResource("/GUI/scenes/commandScenes/updateId.fxml"));
+
+        if (id != null) {
+            TableViewPerson person = tableView.getSelectionModel().getSelectedItem();
+            Parent root = addScene.getRoot();
+
+            TextField idField = (TextField) root.lookup("#idField");
+            idField.setText(String.valueOf(person.getId()));
+            idField.setEditable(false);
+            TextField eyeColorField = (TextField) root.lookup("#eyeColorField");
+            eyeColorField.setText(person.getEyeColor().toString());
+            TextField height = (TextField) root.lookup("#heightField");
+            height.setText(person.getHeight().toString());
+            TextField weight = (TextField) root.lookup("#weightField");
+            weight.setText(person.getWeight().toString());
+            TextField nameField = (TextField) root.lookup("#nameField");
+            nameField.setText(person.getName());
+            TextField nationalityField = (TextField) root.lookup("#nationalityField");
+            nationalityField.setText(person.getNationality().toString());
+            TextField weightField = (TextField) root.lookup("#weightField");
+            weightField.setText(person.getWeight().toString());
+            TextField xCoordField = (TextField) root.lookup("#xCoordField");
+            xCoordField.setText(person.getXCoord().toString());
+            TextField yCoordField = (TextField) root.lookup("#yCoordField");
+            yCoordField.setText(person.getYCoord().toString());
+            TextField xLoocField = (TextField) root.lookup("#xLoocField");
+            xLoocField.setText(person.getXLooc().toString());
+            TextField yLoocField = (TextField) root.lookup("#yLoocField");
+            yLoocField.setText(person.getYLooc().toString());
+            TextField zLoocField = (TextField) root.lookup("#zLoocField");
+            zLoocField.setText(person.getZLooc().toString());
+        }
+
         stage.getIcons().add(new Image("/GUI/images/LOGO.png"));
         stage.initOwner(SessionController.getStage());
         stage.initModality(Modality.WINDOW_MODAL);
@@ -204,9 +240,17 @@ public class MainControlSceneController extends LanguageChanger implements Initi
         stage.show();
     }
 
-    private void openRemoveByIdScene() throws IOException {
+    private void openRemoveByIdScene(String id) throws IOException {
         Stage stage = new Stage();
         Scene addScene = FXMLLoader.load(getClass().getResource("/GUI/scenes/commandScenes/removeById.fxml"));
+
+        if (id != null) {
+            Parent root = addScene.getRoot();
+            TextField idToRemove = (TextField) root.lookup("#idField");
+            idToRemove.setText(id);
+            idToRemove.setEditable(false);
+        }
+
         stage.getIcons().add(new Image("/GUI/images/LOGO.png"));
         stage.initOwner(SessionController.getStage());
         stage.initModality(Modality.WINDOW_MODAL);
@@ -358,6 +402,10 @@ public class MainControlSceneController extends LanguageChanger implements Initi
         filterField.setPromptText(UserSessionManager.getCurrentBundle().getString("Filter"));
         exitBtn.setText(UserSessionManager.getCurrentBundle().getString("Exit"));
 
+        ObservableList<MenuItem> items = cm.getItems();
+        items.get(0).setText(UserSessionManager.getCurrentBundle().getString("Remove"));
+        items.get(1).setText(UserSessionManager.getCurrentBundle().getString("Update"));
+
         ObservableList<TableColumn<TableViewPerson, ?>> tmp = tableView.getColumns();
         ArrayList<String> tmp2 = new ArrayList<>(Arrays.asList("ID", "Name", "Coord X", "Coord Y", "Creation Date",
                 "Height", "Weight", "Eye color", "Nationality", "Location X", "Location Y", "Location Z", "Owner"));
@@ -369,18 +417,15 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     }
 
     private void setZonedDateTimeCellFactory(TableColumn tableColumn) {
+        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, ZonedDateTime>() {
             @Override
             protected void updateItem(ZonedDateTime zdt, boolean empty) {
-                Locale locale = new Locale(UserSessionManager.getCurrentBundle().getString("locale"));
-                DateTimeFormatter f = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM)
-                        .withLocale(locale);
-
                 super.updateItem(zdt, empty);
                 if (empty)
                     setText(null);
                 else
-                    setText(zdt.format(f));
+                    setText(CellDataFormatter.formatZonedDateTime(countryCode, zdt));
             }
         });
     }
@@ -393,7 +438,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 if (empty)
                     setText(null);
                 else
-                    setText(UserSessionManager.getCurrentBundle().getString(String.valueOf(color)));
+                    setText(CellDataFormatter.formatEnum(UserSessionManager.getCurrentBundle(), color));
             }
         });
     }
@@ -406,31 +451,28 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 if (empty)
                     setText(null);
                 else
-                    setText(UserSessionManager.getCurrentBundle().getString(String.valueOf(country)));
+                    setText(CellDataFormatter.formatEnum(UserSessionManager.getCurrentBundle(), country));
             }
         });
     }
 
     private void setLongCellFactory(TableColumn tableColumn) {
+        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Long>() {
-            Locale locale = new Locale(UserSessionManager.getCurrentBundle().getString("locale"));
-            NumberFormat format = NumberFormat.getInstance(locale);
-
             @Override
             protected void updateItem(Long number, boolean empty) {
                 super.updateItem(number, empty);
                 if (empty)
                     setText(null);
                 else
-                    setText(format.format(number));
+                    setText(CellDataFormatter.formatLong(countryCode, number));
             }
         });
     }
 
     private void setIntegerCellFactory(TableColumn tableColumn) {
+        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Integer>() {
-            Locale locale = new Locale(UserSessionManager.getCurrentBundle().getString("locale"));
-            NumberFormat format = NumberFormat.getInstance(locale);
 
             @Override
             protected void updateItem(Integer number, boolean empty) {
@@ -438,15 +480,14 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 if (empty)
                     setText(null);
                 else
-                    setText(format.format(number));
+                    setText(CellDataFormatter.formatInteger(countryCode, number));
             }
         });
     }
 
     private void setFloatCellFactory(TableColumn tableColumn) {
+        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Float>() {
-            Locale locale = new Locale(UserSessionManager.getCurrentBundle().getString("locale"));
-            NumberFormat format = NumberFormat.getInstance(locale);
 
             @Override
             protected void updateItem(Float number, boolean empty) {
@@ -454,15 +495,14 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 if (empty)
                     setText(null);
                 else
-                    setText(format.format(number));
+                    setText(CellDataFormatter.formatFloat(countryCode, number));
             }
         });
     }
 
     private void setDoubleCellFactory(TableColumn tableColumn) {
+        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Double>() {
-            Locale locale = new Locale(UserSessionManager.getCurrentBundle().getString("locale"));
-            NumberFormat format = NumberFormat.getInstance(locale);
 
             @Override
             protected void updateItem(Double number, boolean empty) {
@@ -470,7 +510,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 if (empty)
                     setText(null);
                 else
-                    setText(format.format(number));
+                    setText(CellDataFormatter.formatDouble(countryCode, number));
             }
         });
     }
@@ -511,7 +551,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
 
         menuItem4.setOnAction(event -> {
             try {
-                openUpdateIdScene();
+                openUpdateIdScene(null);
             } catch (IOException e) {
                 throw new RuntimeException(e); // Server error
             }
@@ -519,7 +559,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
 
         menuItem5.setOnAction(event -> {
             try {
-                openRemoveByIdScene();
+                openRemoveByIdScene(null);
             } catch (IOException e) {
                 throw new RuntimeException(e); // Server error
             }
@@ -599,5 +639,102 @@ public class MainControlSceneController extends LanguageChanger implements Initi
 
         commandBtn.getItems().addAll(menuItem1, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7,
                 menuItem8, menuItem9, menuItem10, menuItem11, menuItem12, menuItem13, menuItem14);
+    }
+
+    private SortedList<TableViewPerson> generateFilteredList(){
+        FilteredList<TableViewPerson> filteredList = new FilteredList<>(CollectionWrapper.getCollection(), b -> true);
+        filterField.textProperty().addListener(((observable, oldValue, newValue) -> {
+            filteredList.setPredicate(person ->{
+                if (newValue == null || newValue.isEmpty()) {
+                    return true;
+                }
+
+                String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
+                ResourceBundle bundle = UserSessionManager.getCurrentBundle();
+
+                String lowerCaseFilter = newValue.toLowerCase();
+                if (person.getName().toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (String.valueOf(person.getId()).toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatZonedDateTime(countryCode, person.getCreationDate())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatInteger(countryCode, person.getHeight())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatFloat(countryCode, person.getWeight())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatEnum(bundle, person.getNationality())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatEnum(bundle, person.getEyeColor())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (String.valueOf(person.getUsername()).toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatLong(countryCode, person.getXCoord())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatLong(countryCode, person.getYCoord())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatInteger(countryCode, person.getXLooc())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatFloat(countryCode, person.getYLooc())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else if (CellDataFormatter.formatDouble(countryCode, person.getZLooc())
+                        .toLowerCase().contains(lowerCaseFilter))
+                    return true;
+                else
+                    return false;
+            });
+        }));
+
+        SortedList<TableViewPerson> sortedList = new SortedList<>(filteredList);
+        sortedList.comparatorProperty().bind(tableView.comparatorProperty());
+        return sortedList;
+    }
+
+    private void initContextMenu(){
+        cm = new ContextMenu();
+        MenuItem mi1 = new MenuItem(UserSessionManager.getCurrentBundle().getString("Remove"));
+        MenuItem mi2 = new MenuItem(UserSessionManager.getCurrentBundle().getString("Update"));
+        cm.getItems().addAll(mi1, mi2);
+
+        tableView.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
+            if(t.getButton() == MouseButton.SECONDARY) {
+                cm.show(tableView, t.getScreenX(), t.getScreenY());
+            }
+        });
+
+        tableView.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
+            if(t.getButton() == MouseButton.PRIMARY) {
+                cm.hide();
+            }
+        });
+
+        mi1.setOnAction(event -> {
+            TableViewPerson person = tableView.getSelectionModel().getSelectedItem();
+            String idToRemove = String.valueOf(person.getId());
+            try {
+                openRemoveByIdScene(idToRemove);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        mi2.setOnAction(event -> {
+            TableViewPerson person = tableView.getSelectionModel().getSelectedItem();
+            String idToUpdate = String.valueOf(person.getId());
+            try {
+                openUpdateIdScene(idToUpdate);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 }

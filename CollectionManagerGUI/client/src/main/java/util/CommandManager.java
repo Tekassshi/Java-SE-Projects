@@ -70,7 +70,7 @@ public class CommandManager {
                     Command command = commandQueue.poll();
                     connectionManager.sendRequest(command, authorizationManager.getToken());
                 }
-                res.append(connectionManager.readResponse());
+                res.append(UserSessionManager.getCurrentBundle().getString(connectionManager.readResponse()));
             }
         }
         return res.toString();

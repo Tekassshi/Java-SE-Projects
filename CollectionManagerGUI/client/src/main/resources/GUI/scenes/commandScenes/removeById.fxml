@@ -11,7 +11,7 @@
 <Scene xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="guicontrollers.commandguicontrollers.RemoveByIdSceneController">
     <AnchorPane prefHeight="191.0" prefWidth="324.0" stylesheets="@../../css/commandSceneStyle.css">
       <children>
-         <Text layoutX="19.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Remove by ID" textAlignment="CENTER" wrappingWidth="286.80332946777344">
+         <Text fx:id="label" layoutX="19.0" layoutY="39.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Remove by ID" textAlignment="CENTER" wrappingWidth="286.80332946777344">
             <font>
                <Font size="17.0" />
             </font>

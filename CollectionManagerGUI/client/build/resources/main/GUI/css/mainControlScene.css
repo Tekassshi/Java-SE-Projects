@@ -15,8 +15,8 @@
 }
 
 .table .column-header {
-    -fx-background-color: #dedede;
-    -fx-border-width: 1;
+    -fx-background-color: #eeeeee;
+    -fx-border-width: 0.3;
     -fx-border-color: #b6b6b6;
 }
 
@@ -37,8 +37,32 @@
     -fx-background-color: #dedede;
 }
 
+.menu-item:focused {
+    -fx-background-color: #1d9bff;
+}
+
 .commandBtn .menu-item:focused {
     -fx-background-color: #1d9bff;
+}
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar {
+    -fx-background-color: #ffffff;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: #ffffff;
+}
+
+.scroll-bar:vertical .thumb {
+    -fx-background-color: #c4c4c4;
+}
+
+.scroll-bar:vertical .thumb:hover {
+    -fx-background-color: #adadad;
 }
 
 .exitButton {

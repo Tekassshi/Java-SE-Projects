@@ -5,6 +5,7 @@ import commands.Add;
 import commands.UpdateId;
 import data.*;
 import guicontrollers.SessionController;
+import guicontrollers.abstractions.LanguageChanger;
 import interfaces.AssemblableCommand;
 import interfaces.Command;
 import interfaces.CommandWithArg;
@@ -29,7 +30,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class UpdateIdSceneController implements Initializable {
+public class UpdateIdSceneController extends LanguageChanger implements Initializable {
+
+    @FXML
+    private Text label;
+
     @FXML
     private Text errorMsg;
 
@@ -72,6 +77,7 @@ public class UpdateIdSceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         errorMsg.setVisible(false);
+        changeLanguage();
 
         sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -166,8 +172,9 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setId(Long.parseLong(id));
         }
         catch (NumberFormatException e){
-            errorMsg.setText("Wrong id value! (Id should be > 0 and contain " +
-                    "only digits)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong id value! (Id should be >" +
+                    " 0 and contain " +
+                    "only digits)"));
             errorMsg.setVisible(true);
             idField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -178,8 +185,9 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setName(name);
         }
         catch (IllegalArgumentException e) {
-            errorMsg.setText(" Wrong name format! Name should contain at least 1 symbol and " +
-                    "only letters supported");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong name format! Name should " +
+                    "contain at least 1 symbol and " +
+                    "only letters supported"));
             errorMsg.setVisible(true);
             nameField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -191,8 +199,9 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setyCoord(String.valueOf(coordinates.getY()));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong coordinates format! (\"X\" should be integer number, " +
-                    "that > -783, \"Y\" should be long integer number.)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong coordinates format! " +
+                    "(\"X\" should be integer number, " +
+                    "that > -783, \"Y\" should be long integer number.)"));
             errorMsg.setVisible(true);
             xCoordField.setStyle("-fx-background-color: #ffe6e6");
             yCoordField.setStyle("-fx-background-color: #ffe6e6");
@@ -204,8 +213,9 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setHeight(String.valueOf(height));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong height format! (height should be integer > 0, and " +
-                    "only digits supported)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong height format! " +
+                    "(height should be integer > 0, and " +
+                    "only digits supported)"));
             errorMsg.setVisible(true);
             heightField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -216,7 +226,8 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setWeight(String.valueOf(weight));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong weight format! (weight should be decimal value > 0)");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong weight format! (weight " +
+                    "should be decimal value > 0)"));
             errorMsg.setVisible(true);
             weightField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -227,7 +238,8 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setEyeColor(String.valueOf(eyeColor));
         }
         catch (IllegalArgumentException | IOException e) {
-            errorMsg.setText("Wrong color value! (you can choose one of the values \"GREEN, RED, BLACK, BLUE, YELLOW\")");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong color value! (you " +
+                    "can choose one of the values \"GREEN, RED, BLACK, BLUE, YELLOW\")"));
             errorMsg.setVisible(true);
             eyeColorField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -238,8 +250,9 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setNationality(nationality.toString());
         }
         catch (IllegalArgumentException | IOException e) {
-            errorMsg.setText(" Wrong nationality value! (you can choose one of the values \"RUSSIA, FRANCE, THAILAND, " +
-                    "NORTH_KOREA\")");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong nationality value! " +
+                    "(you can choose one of the values \"RUSSIA, FRANCE, THAILAND, " +
+                    "NORTH_KOREA\")"));
             errorMsg.setVisible(true);
             nationalityField.setStyle("-fx-background-color: #ffe6e6");
             return;
@@ -253,8 +266,9 @@ public class UpdateIdSceneController implements Initializable {
             personParamsContainer.setzLooc(String.valueOf(location.getZ()));
         }
         catch (NumberFormatException | IOException e) {
-            errorMsg.setText("Wrong location format! (\"X\" should be Float number, \"Y\" should be Integer number, " +
-                    "\"Z\" should be Double number.");
+            errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong location format! (\"X\" " +
+                    "should be Float number, \"Y\" should be Integer number, " +
+                    "\"Z\" should be Double number."));
             errorMsg.setVisible(true);
             xLoocField.setStyle("-fx-background-color: #ffe6e6");
             yLoocField.setStyle("-fx-background-color: #ffe6e6");
@@ -272,7 +286,8 @@ public class UpdateIdSceneController implements Initializable {
         Task<String> commandTask = new Task<>() {
             @Override
             protected String call() throws IOException {
-                return UserSessionManager.getCommandManager().processUserCommand((Command) updateIdCommand);
+                String res = UserSessionManager.getCommandManager().processUserCommand((Command) updateIdCommand);
+                return UserSessionManager.getCurrentBundle().getString(res);
             }
         };
 
@@ -312,5 +327,22 @@ public class UpdateIdSceneController implements Initializable {
         xLoocField.setStyle("-fx-background-color: #e5e5e5");
         yLoocField.setStyle("-fx-background-color: #e5e5e5");
         zLoocField.setStyle("-fx-background-color: #e5e5e5");
+    }
+
+    @Override
+    protected void changeLanguage() {
+        sendCommandBtn.setText(UserSessionManager.getCurrentBundle().getString("Update"));
+        label.setText(UserSessionManager.getCurrentBundle().getString(label.getText()));
+        idField.setPromptText(UserSessionManager.getCurrentBundle().getString("ID"));
+        eyeColorField.setPromptText(UserSessionManager.getCurrentBundle().getString(eyeColorField.getPromptText()));
+        heightField.setPromptText(UserSessionManager.getCurrentBundle().getString(heightField.getPromptText()));
+        nameField.setPromptText(UserSessionManager.getCurrentBundle().getString(nameField.getPromptText()));
+        nationalityField.setPromptText(UserSessionManager.getCurrentBundle().getString(nationalityField.getPromptText()));
+        weightField.setPromptText(UserSessionManager.getCurrentBundle().getString(weightField.getPromptText()));
+        xCoordField.setPromptText(UserSessionManager.getCurrentBundle().getString("Coord X"));
+        yCoordField.setPromptText(UserSessionManager.getCurrentBundle().getString("Coord Y"));
+        xLoocField.setPromptText(UserSessionManager.getCurrentBundle().getString(xLoocField.getPromptText()));
+        yLoocField.setPromptText(UserSessionManager.getCurrentBundle().getString(yLoocField.getPromptText()));
+        zLoocField.setPromptText(UserSessionManager.getCurrentBundle().getString(zLoocField.getPromptText()));
     }
 }
