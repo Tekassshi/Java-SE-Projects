@@ -1,5 +1,6 @@
 package guicontrollers.commandguicontrollers;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import commands.AddIfMin;
 import commands.RemoveGreater;
 import data.*;
@@ -27,6 +28,8 @@ import util.UserSessionManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static guicontrollers.SessionController.loadErrPortChoosingField;
 
 public class RemoveGreaterSceneController extends LanguageChanger implements Initializable {
 
@@ -275,8 +278,6 @@ public class RemoveGreaterSceneController extends LanguageChanger implements Ini
             response.setText(commandTask.getValue());
             response.setEditable(false);
         });
-
-        commandTask.setOnFailed(event -> commandTask.getException().printStackTrace());
 
         new Thread(commandTask).start();
     }

@@ -48,7 +48,9 @@ public class RequestExecutor extends RecursiveAction {
         AbstractCommand command = (AbstractCommand) request.getObj();
         command.setCollectionManager(collectionManager);
 
-        logger.info("Executing user \"" + command.getClass().getSimpleName() + "\" command");
+        if (!(command instanceof UpdateCollection))
+            logger.info("Executing user \"" + command.getClass().getSimpleName() + "\" command");
+
         String commandName = command.getClass().getSimpleName();
 
         if ((collectionManager.getCollectionSize() > 40 &&

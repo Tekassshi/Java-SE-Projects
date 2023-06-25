@@ -155,6 +155,7 @@ public class ClassBundle_es_ES extends ListResourceBundle {
 
             // Felmeddelanden
             {"Server error. Please, try later.", "Error del servidor. Por favor, inténtelo más tarde."},
+            {"Session timeout. Connect again.", "Tiempo de sesión agotado. Conéctese nuevamente."},
             {"Welcome back, ","Bienvenido de nuevo, "},
             {"Wrong username or password format (From 5 to 15 symbols and they " +
                     "should contains only english letters or digits.)",

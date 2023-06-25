@@ -20,6 +20,9 @@ public class Server extends ServerTemplate {
     private ServerSocket serverSocket;
     private Logger logger;
 
+    public static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_RESET = "\u001B[0m";
+
     @Override
     public void configureLogger(Logger logger) {
         this.logger = logger;
@@ -57,7 +60,8 @@ public class Server extends ServerTemplate {
         ExecutorService fixedThreadPool = ThreadPoolFactory.getFixedThreadPool();
 
         logger.info("Request processor was started successfully.\n");
-        System.out.println("Server is currently running on port: " +  serverSocket.getLocalPort() + "\n");
+        System.out.println("Server is currently running on port: " + ANSI_GREEN + serverSocket.getLocalPort()
+                + ANSI_RESET + "\n");
 
         while (true) {
             Socket client = serverSocket.accept();

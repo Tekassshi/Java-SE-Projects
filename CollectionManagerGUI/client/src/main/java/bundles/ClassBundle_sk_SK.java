@@ -153,6 +153,7 @@ public class ClassBundle_sk_SK extends ListResourceBundle {
 
             // Chybové správy
             {"Server error. Please, try later.", "Chyba servera. Skúste to prosím neskôr."},
+            {"Session timeout. Connect again.", "Vypršal čas relácie. Pripojte sa znova."},
             {"Welcome back, ","Vitajte späť, "},
             {"Wrong username or password format (From 5 to 15 symbols and they " +
                     "should contains only english letters or digits.)",

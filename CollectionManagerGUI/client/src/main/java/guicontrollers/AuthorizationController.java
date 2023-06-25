@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static guicontrollers.SessionController.loadErrPortChoosingField;
+
 public class AuthorizationController extends LanguageChanger implements Initializable {
     private AuthorizationManager authorizationManager = UserSessionManager.getAuthorizationManager();
 
@@ -99,42 +101,22 @@ public class AuthorizationController extends LanguageChanger implements Initiali
             }
         };
 
-        authTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                boolean res = authTask.getValue();
-                if (res) {
-                    try {
-                        loadWelcomePage(username);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+        authTask.setOnSucceeded(event -> {
+            boolean res = authTask.getValue();
+            if (res) {
+                try {
+                    System.out.println("Task succeed. Welcome page loading.");
+                    loadWelcomePage(username);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
-                else {
-                    setWrongAuthDesign();
-                    SessionController.setScene(errorMsg.getScene());
-                }
+            }
+            else {
+                setWrongAuthDesign();
+                SessionController.setScene(errorMsg.getScene());
             }
         });
 
-        authTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Throwable exception = authTask.getException();
-
-                if (exception instanceof IllegalArgumentException) {
-                    setWrongInputDesign();
-                    SessionController.setScene(errorMsg.getScene());
-                }
-                else if (exception instanceof IOException) {
-                    try {
-                        loadErrPortChoosingField();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
         new Thread(authTask).start();
     }
 
@@ -156,15 +138,6 @@ public class AuthorizationController extends LanguageChanger implements Initiali
 
         username.setText(user);
         SessionController.setScene(welcomeScene);
-    }
-
-    private void loadErrPortChoosingField() throws IOException {
-        Scene scene = FXMLLoader.load(getClass().getResource("/GUI/scenes/portChoiceScene.fxml"));
-        Parent root = scene.getRoot();
-        Text errorMsg = (Text) root.lookup("#errorMsg");
-        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Server error. Please, try later."));
-        errorMsg.setVisible(true);
-        SessionController.setScene(scene);
     }
 
     public void setDefaultDesign(){

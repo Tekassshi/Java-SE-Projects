@@ -44,14 +44,11 @@ public class ExecuteScriptSceneController extends LanguageChanger implements Ini
         errorMsg.setVisible(false);
         changeLanguage();
 
-        sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                try {
-                    sendCommand();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        sendCommandBtn.setOnAction(event -> {
+            try {
+                sendCommand();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
 
@@ -93,49 +90,43 @@ public class ExecuteScriptSceneController extends LanguageChanger implements Ini
             }
         };
 
-        commandTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Parent root = resStage.getScene().getRoot();
-                TextArea response = (TextArea) root.lookup("#textArea");
-                VBox vBox = (VBox) root.lookup("#vBox");
-                vBox.setVisible(true);
-                vBox.setDisable(false);
-                response.setText(commandTask.getValue());
-                response.setEditable(false);
-            }
+        commandTask.setOnSucceeded(event -> {
+            Parent root1 = resStage.getScene().getRoot();
+            TextArea response = (TextArea) root1.lookup("#textArea");
+            VBox vBox = (VBox) root1.lookup("#vBox");
+            vBox.setVisible(true);
+            vBox.setDisable(false);
+            response.setText(commandTask.getValue());
+            response.setEditable(false);
         });
 
-        commandTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Throwable exception = commandTask.getException();
+        commandTask.setOnFailed(event -> {
+            Throwable exception = commandTask.getException();
 
-                if (exception instanceof FileNotFoundException) {
-                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("File doesn't exist!"));
-                    errorMsg.setVisible(true);
-                    scriptPathField.setStyle("-fx-background-color: #ffe6e6");
-                }
-                else if (exception instanceof IllegalArgumentException ||
-                        exception instanceof IOException ||
-                        exception instanceof InputMismatchException ||
-                        exception instanceof NullPointerException) {
+            if (exception instanceof FileNotFoundException) {
+                errorMsg.setText(UserSessionManager.getCurrentBundle().getString("File doesn't exist!"));
+                errorMsg.setVisible(true);
+                scriptPathField.setStyle("-fx-background-color: #ffe6e6");
+            }
+            else if (exception instanceof IllegalArgumentException ||
+                    exception instanceof IOException ||
+                    exception instanceof InputMismatchException ||
+                    exception instanceof NullPointerException) {
 
-                        errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong data in script. " +
-                                "Process will be terminated."));
-                        errorMsg.setVisible(true);
-                        scriptPathField.setStyle("-fx-background-color: #ffe6e6");
-                }
-                else if (exception instanceof RuntimeException) {
-                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Recursion detected. " +
+                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Wrong data in script. " +
                             "Process will be terminated."));
                     errorMsg.setVisible(true);
                     scriptPathField.setStyle("-fx-background-color: #ffe6e6");
-                }
-
-                resStage.close();
-                currentStage.show();
             }
+            else if (exception instanceof RuntimeException) {
+                errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Recursion detected. " +
+                        "Process will be terminated."));
+                errorMsg.setVisible(true);
+                scriptPathField.setStyle("-fx-background-color: #ffe6e6");
+            }
+
+            resStage.close();
+            currentStage.show();
         });
 
         new Thread(commandTask).start();

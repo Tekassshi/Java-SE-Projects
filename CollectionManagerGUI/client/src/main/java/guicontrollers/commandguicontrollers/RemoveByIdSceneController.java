@@ -1,5 +1,6 @@
 package guicontrollers.commandguicontrollers;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import commands.Add;
 import commands.RemoveById;
 import data.*;
@@ -28,6 +29,8 @@ import util.UserSessionManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static guicontrollers.SessionController.loadErrPortChoosingField;
 
 public class RemoveByIdSceneController extends LanguageChanger implements Initializable {
     @FXML
@@ -109,13 +112,6 @@ public class RemoveByIdSceneController extends LanguageChanger implements Initia
                 vBox.setDisable(false);
                 response.setText(commandTask.getValue());
                 response.setEditable(false);
-            }
-        });
-
-        commandTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                commandTask.getException().printStackTrace();
             }
         });
 

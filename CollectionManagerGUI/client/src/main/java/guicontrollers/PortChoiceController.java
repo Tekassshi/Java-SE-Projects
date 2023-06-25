@@ -109,8 +109,8 @@ public class PortChoiceController extends LanguageChanger implements Initializab
                 }
                 else {
                     SessionController.setScene(errorMsg.getScene());
-                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Server is unavailable. " +
-                            "Please, try later."));
+                    errorMsg.setText(UserSessionManager.getCurrentBundle().getString("Server error. Please, " +
+                            "try later."));
                     errorMsg.setVisible(true);
                 }
             }

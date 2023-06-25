@@ -48,7 +48,7 @@ public class LongResponseSender extends RecursiveAction {
 
             if (collectionManager.getCollectionHash() == collectionManager.getUpdatedHash(socket)) {
                 ServerResponse response = new ServerResponse(null);
-                ResponseSender responseSenderTask = new ResponseSender(socket, user, response, false);
+                ResponseSender responseSenderTask = new ResponseSender(socket, user, response, true);
                 forkJoinSendersPool.invoke(responseSenderTask);
                 return;
             }
@@ -60,8 +60,6 @@ public class LongResponseSender extends RecursiveAction {
 
         int collectionSize = tmp.size();
         int numOfPackages = (int) Math.ceil(collectionSize / packageSize);
-
-        System.out.println("Num of pckg" + numOfPackages);
 
         int packageCounter = 0;
         int objectCounter = 0;
@@ -83,7 +81,9 @@ public class LongResponseSender extends RecursiveAction {
         forkJoinSendersPool.invoke(responseLengthTask);
 
         Long startTime = System.currentTimeMillis();
-        logger.info("Sending reply to the user");
+
+        if (!(command instanceof UpdateCollection))
+            logger.info("Sending reply to the user");
 
         while (packageCounter < numOfPackages){
             String commandRes = ""; // For long string sending
@@ -106,7 +106,6 @@ public class LongResponseSender extends RecursiveAction {
             }
             packageCounter++;
 
-            System.out.println("req sent");
             ServerResponse response = new ServerResponse(pack);;
             if (!(command instanceof UpdateCollection)) {
                 response = new ServerResponse(commandRes);

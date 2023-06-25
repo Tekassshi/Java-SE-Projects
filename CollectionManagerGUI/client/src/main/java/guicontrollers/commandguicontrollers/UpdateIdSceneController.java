@@ -1,7 +1,6 @@
 package guicontrollers.commandguicontrollers;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import commands.Add;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import commands.UpdateId;
 import data.*;
 import guicontrollers.SessionController;
@@ -10,9 +9,6 @@ import interfaces.AssemblableCommand;
 import interfaces.Command;
 import interfaces.CommandWithArg;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -29,6 +25,8 @@ import util.UserSessionManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static guicontrollers.SessionController.loadErrPortChoosingField;
 
 public class UpdateIdSceneController extends LanguageChanger implements Initializable {
 
@@ -79,14 +77,11 @@ public class UpdateIdSceneController extends LanguageChanger implements Initiali
         errorMsg.setVisible(false);
         changeLanguage();
 
-        sendCommandBtn.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                try {
-                    sendCommand();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+        sendCommandBtn.setOnAction(event -> {
+            try {
+                sendCommand();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         });
 
@@ -291,24 +286,14 @@ public class UpdateIdSceneController extends LanguageChanger implements Initiali
             }
         };
 
-        commandTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Parent root = resStage.getScene().getRoot();
-                TextArea response = (TextArea) root.lookup("#textArea");
-                VBox vBox = (VBox) root.lookup("#vBox");
-                vBox.setVisible(true);
-                vBox.setDisable(false);
-                response.setText(commandTask.getValue());
-                response.setEditable(false);
-            }
-        });
-
-        commandTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                commandTask.getException().printStackTrace();
-            }
+        commandTask.setOnSucceeded(event -> {
+            Parent root = resStage.getScene().getRoot();
+            TextArea response = (TextArea) root.lookup("#textArea");
+            VBox vBox = (VBox) root.lookup("#vBox");
+            vBox.setVisible(true);
+            vBox.setDisable(false);
+            response.setText(commandTask.getValue());
+            response.setEditable(false);
         });
 
         new Thread(commandTask).start();

@@ -1,8 +1,7 @@
 package util;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import commands.AuthorizationCommand;
-import commands.LogIn;
-import commands.SignUp;
 import connection.ClientRequest;
 import connection.ServerResponse;
 import data.Person;
@@ -30,8 +29,6 @@ public class ConnectionManager {
     private static boolean isLongReply = false;
     private static long packages = 0;
     private static boolean isFirstPackage = true;
-
-    private AuthorizationManager authorizationManager;
 
     public ConnectionManager() {
         try {
@@ -90,7 +87,7 @@ public class ConnectionManager {
         }
     }
 
-    public synchronized void sendRequest(Command command, String token) throws IOException{
+    public synchronized void sendRequest(Command command, String token) throws IOException {
         ClientRequest request = new ClientRequest(command);
         request.setToken(token);
         ByteBuffer bb = ByteBuffer.wrap(SerializationManager.serialize(request));
@@ -100,7 +97,7 @@ public class ConnectionManager {
         }
         catch (Exception e){
             if (!tryConnect(port))
-                throw new IOException();
+               throw new IOException();
         }
     }
 
@@ -121,9 +118,11 @@ public class ConnectionManager {
         }
     }
 
-    public synchronized String readResponse() throws IOException{
+    public synchronized String readResponse() throws IOException, JWTVerificationException {
         StringBuilder res = new StringBuilder("");
         isFirstPackage = true;
+
+        long start = System.currentTimeMillis();
 
         while (true) {
             ByteBuffer bb = ByteBuffer.allocate(20000);
@@ -140,15 +139,13 @@ public class ConnectionManager {
                 }
 
                 try {
+                    if (System.currentTimeMillis() - start > 5000)
+                        throw new IOException();
+
                     if (!key.isReadable())
                         continue;
 
-                    try {
-                        sc.read(bb);
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    sc.read(bb);
                     ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
                     Object responseObj = response.getObj();
 
@@ -157,7 +154,13 @@ public class ConnectionManager {
                         isLongReply = true;
                     }
 
+                    if (responseObj instanceof JWTVerificationException) {
+                        throw new JWTVerificationException(null);
+                    }
+
                     if (isLongReply) {
+                        start = System.currentTimeMillis();
+
                         if (!isFirstPackage)
                             packages--;
                         if (isFirstPackage) {
@@ -174,14 +177,19 @@ public class ConnectionManager {
                     else
                         return responseObj.toString();
                 }
-                catch (Exception e){
+                catch (JWTVerificationException e) {
+                    sc.close();
+                    throw new JWTVerificationException(null);
+                }
+                catch (ClassNotFoundException e) {
+                    System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
+                }
+                catch (IOException e){
                     if (!tryConnect(port))
-                        e.printStackTrace();
+                        throw new IOException();
 
                     if (isLongReply)
                         isLongReply = false;
-
-                    System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
                 }
             }
         }
@@ -216,9 +224,11 @@ public class ConnectionManager {
         }
     }
 
-    public synchronized ArrayList<Person> readUpdatedCollectionResponse() throws IOException{
+    public synchronized ArrayList<Person> readUpdatedCollectionResponse() throws JWTVerificationException, IOException {
         ArrayList<Person> collection = new ArrayList<>();
         isFirstPackage = true;
+
+        long start = System.currentTimeMillis();
 
         while (true) {
             ByteBuffer bb = ByteBuffer.allocate(20000);
@@ -235,20 +245,23 @@ public class ConnectionManager {
                 }
 
                 try {
+                    if (System.currentTimeMillis() - start > 5000)
+                        throw new IOException();
+
                     if (!key.isReadable())
                         continue;
 
-                    try {
-                        sc.read(bb);
-                    }
-                    catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    sc.read(bb);
+
                     ServerResponse response = (ServerResponse) SerializationManager.deserialize(bb.array());
                     Object responseObj = response.getObj();
 
                     if (responseObj == null)
                         return null;
+
+                    if (responseObj instanceof JWTVerificationException) {
+                        throw new JWTVerificationException(null);
+                    }
 
                     if (responseObj instanceof Integer){
                         packages = (Integer) responseObj;
@@ -256,6 +269,8 @@ public class ConnectionManager {
                     }
 
                     if (isLongReply) {
+                        start = System.currentTimeMillis();
+
                         if (!isFirstPackage)
                             packages--;
                         if (isFirstPackage) {
@@ -275,14 +290,19 @@ public class ConnectionManager {
                         return collection;
                     }
                 }
-                catch (Exception e){
+                catch (JWTVerificationException e) {
+                    sc.close();
+                    throw new JWTVerificationException(null);
+                }
+                catch (ClassNotFoundException e) {
+                    System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
+                }
+                catch (IOException e){
                     if (!tryConnect(port))
-                        e.printStackTrace();
+                        throw new IOException();
 
                     if (isLongReply)
                         isLongReply = false;
-
-                    System.out.println(ANSI_RED + "\nError while reading last response. Try again.\n");
                 }
             }
         }
@@ -290,13 +310,5 @@ public class ConnectionManager {
 
     public Selector getSelector() {
         return selector;
-    }
-
-    public static void setIsFirstPackage(boolean isFirstPackage) {
-        ConnectionManager.isFirstPackage = isFirstPackage;
-    }
-
-    public static boolean isLongReply() {
-        return isLongReply;
     }
 }

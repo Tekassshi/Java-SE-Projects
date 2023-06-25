@@ -1,5 +1,6 @@
 package guicontrollers;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import commands.Head;
 import commands.Info;
 import commands.PrintFieldDescendingHeight;
@@ -7,15 +8,14 @@ import commands.Show;
 import data.*;
 import guicontrollers.abstractions.LanguageChanger;
 import interfaces.Command;
+import javafx.animation.FillTransition;
+import javafx.animation.PathTransition;
+import javafx.animation.SequentialTransition;
 import javafx.application.Platform;
-import javafx.beans.property.Property;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -26,26 +26,27 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import util.*;
 
 import java.io.IOException;
 import java.net.URL;
-import java.text.NumberFormat;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
 import java.util.*;
+
+import static guicontrollers.SessionController.loadErrPortChoosingField;
 
 public class MainControlSceneController extends LanguageChanger implements Initializable {
 
     private CommandManager commandManager = UserSessionManager.getCommandManager();
-    private Property<ObservableList<TableViewPerson>> personTableProperty =
-            new SimpleObjectProperty<>(CollectionWrapper.getCollection());
 
     @FXML
     private MenuButton languageMenu;
@@ -68,11 +69,19 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     @FXML
     private Text username;
 
+    @FXML
+    private AnchorPane visualPane;
+
+    HashMap<String, javafx.scene.paint.Color> colorMap;
+    HashMap <Integer, Label> infoMap;
+    Random random = new Random();
+
     ContextMenu cm;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+        colorMap = new HashMap<>();
+        infoMap = new HashMap<>();
         initMenu();
         initContextMenu();
 
@@ -289,6 +298,17 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             response.setEditable(false);
         });
 
+        commandTask.setOnFailed(event -> {
+            try {
+                if (commandTask.getException() instanceof IOException)
+                    loadErrPortChoosingField("Server error. Please, try later.");
+                else if (commandTask.getException() instanceof JWTVerificationException)
+                    loadErrPortChoosingField("Session timeout. Connect again.");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
         new Thread(commandTask).start();
     }
 
@@ -357,6 +377,16 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             response.setEditable(false);
         });
 
+        commandTask.setOnFailed(event -> {
+            try {
+                if (commandTask.getException() instanceof IOException)
+                    loadErrPortChoosingField("Server error. Please, try later.");
+                else if (commandTask.getException() instanceof JWTVerificationException)
+                    loadErrPortChoosingField("Session timeout. Connect again.");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         new Thread(commandTask).start();
     }
 
@@ -390,6 +420,17 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             vBox.setDisable(false);
             response.setText(commandTask.getValue());
             response.setEditable(false);
+        });
+
+        commandTask.setOnFailed(event -> {
+            try {
+                if (commandTask.getException() instanceof IOException)
+                    loadErrPortChoosingField("Server error. Please, try later.");
+                else if (commandTask.getException() instanceof JWTVerificationException)
+                    loadErrPortChoosingField("Session timeout. Connect again.");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
 
         new Thread(commandTask).start();
@@ -537,7 +578,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openInfoScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -545,7 +586,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openAddScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -553,7 +594,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openUpdateIdScene(null);
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -561,7 +602,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openRemoveByIdScene(null);
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -569,7 +610,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openClearScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -577,7 +618,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openExecuteScriptScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -585,7 +626,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openHeadScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -593,7 +634,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openAddIfMinScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -601,7 +642,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openRemoveGreaterScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -609,7 +650,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openRemoveByNationalityScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -617,7 +658,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openShowScene();
             } catch (IOException e) {
-                throw new RuntimeException(e); // Server error
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -625,7 +666,7 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openFilterByNationalityScene();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e); // Load error
             }
         });
 
@@ -633,12 +674,20 @@ public class MainControlSceneController extends LanguageChanger implements Initi
             try {
                 openPrintDescHeightScene();
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException(e); // Load error
             }
         });
 
         commandBtn.getItems().addAll(menuItem1, menuItem2, menuItem3, menuItem4, menuItem5, menuItem6, menuItem7,
                 menuItem8, menuItem9, menuItem10, menuItem11, menuItem12, menuItem13, menuItem14);
+
+        animBtn.setOnAction(event -> {
+            try {
+                open2DScene();
+            } catch (IOException e) {
+                throw new RuntimeException(e); // Load error
+            }
+        });
     }
 
     private SortedList<TableViewPerson> generateFilteredList(){
@@ -736,5 +785,178 @@ public class MainControlSceneController extends LanguageChanger implements Initi
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    private void open2DScene() throws IOException {
+        Stage stage = new Stage();
+        stage.getIcons().add(new Image("/GUI/images/LOGO.png"));
+        Scene scene = FXMLLoader.load(getClass().getResource("/GUI/scenes/2D.fxml"));
+        visualPane = (AnchorPane) scene.lookup("#visualPane");
+        stage.setScene(scene);
+        visualise(false);
+        stage.initOwner(SessionController.getStage());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.show();
+    }
+
+    public void visualise(boolean refresh) {
+        infoMap.clear();
+        colorMap.clear();
+
+        for (var person : tableView.getItems()) {
+            var creatorName = person.getUsername();
+
+            if (!colorMap.containsKey(creatorName)) {
+                var r = random.nextDouble();
+                var g = random.nextDouble();
+                var b = random.nextDouble();
+                if (Math.abs(r - g) + Math.abs(r - b) + Math.abs(b - g) < 0.6) {
+                    r += (1 - r) / 1.4;
+                    g += (1 - g) / 1.4;
+                    b += (1 - b) / 1.4;
+                }
+                colorMap.put(creatorName, javafx.scene.paint.Color.color(r, g, b));
+            }
+
+            var size = Math.min(125, Math.max(55, 15 * 2) / 2);
+
+            var circle = new Circle(size, colorMap.get(creatorName));
+            double x = Math.abs(person.getXCoord());
+            while (x >= 720) {
+                x = x / 10;
+            }
+            double y = Math.abs(person.getYCoord());
+            while (y >= 370) {
+                y = y / 3;
+            }
+            if (y < 100) y += 125;
+
+            var id = new Text('#' + String.valueOf(person.getId()));
+            var info = new Label(describePerson(person));
+
+            info.setVisible(false);
+            circle.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
+                if(t.getButton() == MouseButton.SECONDARY) {
+                    try {
+                        openUpdateIdFrom2DScene(person);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
+            circle.setOnMouseEntered(mouseEvent -> {
+                id.setVisible(false);
+                info.setVisible(true);
+                circle.setFill(colorMap.get(creatorName).brighter());
+            });
+
+            circle.setOnMouseExited(mouseEvent -> {
+                id.setVisible(true);
+                info.setVisible(false);
+                circle.setFill(colorMap.get(creatorName));
+            });
+
+            id.setFont(Font.font("Segoe UI", size / 3));
+            info.setStyle("-fx-background-color: white; -fx-border-color: #c0c0c0; -fx-border-width: 2");
+            info.setFont(Font.font("Segoe UI", 15));
+
+            visualPane.getChildren().add(circle);
+            visualPane.getChildren().add(id);
+
+            infoMap.put((int) person.getId(), info);
+            if (!refresh) {
+                var path = new Path();
+                path.getElements().add(new MoveTo(-500, -150));
+                path.getElements().add(new HLineTo(x));
+                path.getElements().add(new VLineTo(y));
+                id.translateXProperty().bind(circle.translateXProperty().subtract(id.getLayoutBounds().getWidth() / 2));
+                id.translateYProperty().bind(circle.translateYProperty().add(id.getLayoutBounds().getHeight() / 4));
+                info.translateXProperty().bind(circle.translateXProperty().add(circle.getRadius()));
+                info.translateYProperty().bind(circle.translateYProperty().subtract(120));
+                var transition = new PathTransition();
+                transition.setDuration(Duration.millis(750));
+                transition.setNode(circle);
+                transition.setPath(path);
+                transition.setOrientation(PathTransition.OrientationType.NONE);
+                transition.play();
+            } else {
+                circle.setCenterX(x);
+                circle.setCenterY(y);
+                info.translateXProperty().bind(circle.centerXProperty().add(circle.getRadius()));
+                info.translateYProperty().bind(circle.centerYProperty().subtract(120));
+                id.translateXProperty().bind(circle.centerXProperty().subtract(id.getLayoutBounds().getWidth() / 2));
+                id.translateYProperty().bind(circle.centerYProperty().add(id.getLayoutBounds().getHeight() / 4));
+                var darker = new FillTransition(Duration.millis(750), circle);
+                darker.setFromValue(colorMap.get(creatorName));
+                darker.setToValue(colorMap.get(creatorName).darker().darker());
+                var brighter = new FillTransition(Duration.millis(750), circle);
+                brighter.setFromValue(colorMap.get(creatorName).darker().darker());
+                brighter.setToValue(colorMap.get(creatorName));
+                var transition = new SequentialTransition(darker, brighter);
+                transition.play();
+            }
+        }
+
+        for (var id : infoMap.keySet()) {
+            visualPane.getChildren().add(infoMap.get(id));
+        }
+    }
+
+    private void openUpdateIdFrom2DScene(TableViewPerson person) throws IOException {
+        Stage stage = new Stage();
+        Scene addScene = FXMLLoader.load(getClass().getResource("/GUI/scenes/commandScenes/updateId.fxml"));
+
+            Parent root = addScene.getRoot();
+
+            TextField idField = (TextField) root.lookup("#idField");
+            idField.setText(String.valueOf(person.getId()));
+            idField.setEditable(false);
+            TextField eyeColorField = (TextField) root.lookup("#eyeColorField");
+            eyeColorField.setText(person.getEyeColor().toString());
+            TextField height = (TextField) root.lookup("#heightField");
+            height.setText(person.getHeight().toString());
+            TextField weight = (TextField) root.lookup("#weightField");
+            weight.setText(person.getWeight().toString());
+            TextField nameField = (TextField) root.lookup("#nameField");
+            nameField.setText(person.getName());
+            TextField nationalityField = (TextField) root.lookup("#nationalityField");
+            nationalityField.setText(person.getNationality().toString());
+            TextField weightField = (TextField) root.lookup("#weightField");
+            weightField.setText(person.getWeight().toString());
+            TextField xCoordField = (TextField) root.lookup("#xCoordField");
+            xCoordField.setText(person.getXCoord().toString());
+            TextField yCoordField = (TextField) root.lookup("#yCoordField");
+            yCoordField.setText(person.getYCoord().toString());
+            TextField xLoocField = (TextField) root.lookup("#xLoocField");
+            xLoocField.setText(person.getXLooc().toString());
+            TextField yLoocField = (TextField) root.lookup("#yLoocField");
+            yLoocField.setText(person.getYLooc().toString());
+            TextField zLoocField = (TextField) root.lookup("#zLoocField");
+            zLoocField.setText(person.getZLooc().toString());
+
+        stage.getIcons().add(new Image("/GUI/images/LOGO.png"));
+        stage.initOwner(SessionController.getStage());
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.setScene(addScene);
+        stage.setResizable(false);
+        stage.show();
+    }
+
+    public String describePerson(TableViewPerson person){
+        String s = "";
+        s += "Id: " + person.getId() + "\n";
+        s += "Name: " + person.getName() + "\n";
+        s += "Coordinates: x = \"" + person.getXCoord() + "\", y = \"" +
+                person.getYCoord() + "\"\n";
+        s += "Creation date: " + person.getCreationDate() + "\n";
+        s += "Height: " + person.getHeight() + "\n";
+        s += "Weight: " + person.getWeight() + "\n";
+        s += "Eye color: " + person.getEyeColor() + "\n";
+        s += "Nationality: " + person.getNationality() + "\n";
+        s += "Location: x = \"" + person.getXLooc() + "\", y = \"" +
+                person.getYLooc() + "\", z = \"" + person.getZLooc() + "\"\n";
+        s += "Created by: " + person.getUsername() + "\n\n";
+        return s;
     }
 }

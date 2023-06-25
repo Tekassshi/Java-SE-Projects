@@ -174,6 +174,7 @@ public class ClassBundle_sv_SV extends ListResourceBundle {
 
             // Error messages
             {"Server error. Please, try later.", "Serverfel. Försök igen senare."},
+            {"Session timeout. Connect again.", "Sessionen har löpt ut. Anslut igen."},
             {"Welcome back, ","Välkommen tillbaka, "},
             {"Wrong username or password format (From 5 to 15 symbols and they " +
                     "should contains only english letters or digits.)",

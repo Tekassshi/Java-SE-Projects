@@ -1,5 +1,6 @@
 package guicontrollers.commandguicontrollers;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import commands.Clear;
 import guicontrollers.SessionController;
 import guicontrollers.abstractions.LanguageChanger;
@@ -21,6 +22,8 @@ import util.UserSessionManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
+import static guicontrollers.SessionController.loadErrPortChoosingField;
 
 public class ClearSceneController extends LanguageChanger implements Initializable {
 
@@ -62,24 +65,14 @@ public class ClearSceneController extends LanguageChanger implements Initializab
             }
         };
 
-        commandTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Parent root = resStage.getScene().getRoot();
-                TextArea response = (TextArea) root.lookup("#textArea");
-                VBox vBox = (VBox) root.lookup("#vBox");
-                vBox.setVisible(true);
-                vBox.setDisable(false);
-                response.setText(commandTask.getValue());
-                response.setEditable(false);
-            }
-        });
-
-        commandTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                commandTask.getException().printStackTrace();
-            }
+        commandTask.setOnSucceeded(event -> {
+            Parent root = resStage.getScene().getRoot();
+            TextArea response = (TextArea) root.lookup("#textArea");
+            VBox vBox = (VBox) root.lookup("#vBox");
+            vBox.setVisible(true);
+            vBox.setDisable(false);
+            response.setText(commandTask.getValue());
+            response.setEditable(false);
         });
 
         new Thread(commandTask).start();

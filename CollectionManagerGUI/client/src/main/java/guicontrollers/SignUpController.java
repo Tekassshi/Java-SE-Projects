@@ -130,25 +130,6 @@ public class SignUpController extends LanguageChanger implements Initializable {
             }
         });
 
-        authTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Throwable exception = authTask.getException();
-
-                if (exception instanceof IllegalArgumentException) {
-                    setWrongInputDesign();
-                    SessionController.setScene(errorMsg.getScene());
-                }
-                else if (exception instanceof IOException) {
-                    try {
-                        loadErrPortChoosingField();
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-        });
-
         new Thread(authTask).start();
     }
 

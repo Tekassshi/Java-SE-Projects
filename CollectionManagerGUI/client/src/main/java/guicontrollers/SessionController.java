@@ -1,22 +1,23 @@
 package guicontrollers;
 
-import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import util.CollectionUpdater;
+import javafx.stage.Window;
+import util.UserSessionManager;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SessionController {
     static private Stage stage;
-    static public CollectionUpdater collectionUpdater;
 
     public static Stage getStage() {
         return stage;
@@ -45,5 +46,24 @@ public class SessionController {
         stage1.getIcons().add(new Image("/GUI/images/LOGO.png"));
         stage1.show();
         return stage1;
+    }
+
+    public static void loadErrPortChoosingField(String errorCode) throws IOException {
+        Stage stage = getStage();
+        Window currentWindow = stage.getScene().getWindow();
+
+        List<Window> list = Stage.getWindows().stream().toList();
+        list.forEach(window -> {
+            if (window != currentWindow)
+                ((Stage) window).close();
+        });
+
+        Scene scene = FXMLLoader.load(SessionController.class.getResource("/GUI/scenes/portChoiceScene.fxml"));
+        Parent root = scene.getRoot();
+        Text errorMsg = (Text) root.lookup("#errorMsg");
+        errorMsg.setText(UserSessionManager.getCurrentBundle().getString(errorCode));
+        errorMsg.setVisible(true);
+        stage.setResizable(false);
+        SessionController.setScene(scene);
     }
 }

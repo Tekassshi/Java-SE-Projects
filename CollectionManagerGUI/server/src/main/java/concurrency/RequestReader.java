@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import commands.UpdateCollection;
 import connection.ClientRequest;
 import connection.SerializationManager;
 import connection.ServerResponse;
@@ -44,10 +45,9 @@ public class RequestReader implements Runnable {
 
                 InputStream is = socket.getInputStream();
                 byte[] arr = new byte[5000];
-                ClientRequest request = null;
+                ClientRequest request;
 
                 try {
-                    logger.info("Reading client request.");
                     is.read(arr);
 
                     if (SerializationManager.isEmpty(arr)){
@@ -73,14 +73,17 @@ public class RequestReader implements Runnable {
                 }
                 catch (JWTVerificationException e) {
                     logger.warn("Client \"" + user + "\" token timeout. Connection closed.\n");
-                    ServerResponse response = new ServerResponse("\nSession timeout. Connection closed. " +
-                            "Please, log in again.\n");
+                    ServerResponse response = new ServerResponse(new JWTVerificationException(null));
                     ResponseSender responseSenderTask =
-                            new ResponseSender(socket, user, response, false);
+                            new ResponseSender(socket, user, response, true);
                     forkJoinSendersPool.execute(responseSenderTask);
                     Thread.sleep(1000);
                     socket.close();
                     return;
+                }
+
+                if (! (request.getObj() instanceof UpdateCollection)) {
+                    logger.info("Reading client request completed.");
                 }
 
                 RequestExecutor requestExecutorTask = new RequestExecutor(socket, collectionManager, user, request);

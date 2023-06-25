@@ -44,6 +44,8 @@ public class AuthorizationManager {
     private synchronized boolean processAuthorizationResponse()
             throws IOException {
 
+        long start = System.currentTimeMillis();
+
         while (true) {
             if (selector.select() > 0) {
                 Set<SelectionKey> readySet = selector.selectedKeys();
@@ -55,6 +57,8 @@ public class AuthorizationManager {
                     key = readySetIterator.next();
                     readySetIterator.remove();
                 }
+                if (System.currentTimeMillis() - start > 5000)
+                    throw new IOException();
                 if (key.isReadable()) {
                     Object[] result = connectionManager.readAuthorizationResponse();
 

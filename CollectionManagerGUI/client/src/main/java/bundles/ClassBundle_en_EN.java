@@ -145,6 +145,7 @@ public class ClassBundle_en_EN extends ListResourceBundle {
 
             // Error messages
             {"Server error. Please, try later.", "Server error. Please, try later."},
+            {"Session timeout. Connect again.", "Session timeout. Connect again."},
             {"Wrong username or password format (From 5 to 15 symbols and they " +
                     "should contains only english letters or digits.)",
                     "Wrong username or password format (From 5 to 15 symbols and they " +

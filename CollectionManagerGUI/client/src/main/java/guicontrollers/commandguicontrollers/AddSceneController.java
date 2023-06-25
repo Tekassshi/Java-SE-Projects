@@ -7,9 +7,6 @@ import guicontrollers.abstractions.LanguageChanger;
 import interfaces.AssemblableCommand;
 import interfaces.Command;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
@@ -26,8 +23,6 @@ import util.UserSessionManager;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-
-import static guicontrollers.SessionController.getStage;
 
 public class AddSceneController extends LanguageChanger implements Initializable {
 
@@ -265,24 +260,14 @@ public class AddSceneController extends LanguageChanger implements Initializable
             }
         };
 
-        commandTask.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                Parent root = resStage.getScene().getRoot();
-                TextArea response = (TextArea) root.lookup("#textArea");
-                VBox vBox = (VBox) root.lookup("#vBox");
-                vBox.setVisible(true);
-                vBox.setDisable(false);
-                response.setText(commandTask.getValue());
-                response.setEditable(false);
-            }
-        });
-
-        commandTask.setOnFailed(new EventHandler<WorkerStateEvent>() {
-            @Override
-            public void handle(WorkerStateEvent event) {
-                commandTask.getException().printStackTrace();
-            }
+        commandTask.setOnSucceeded(event -> {
+            Parent root = resStage.getScene().getRoot();
+            TextArea response = (TextArea) root.lookup("#textArea");
+            VBox vBox = (VBox) root.lookup("#vBox");
+            vBox.setVisible(true);
+            vBox.setDisable(false);
+            response.setText(commandTask.getValue());
+            response.setEditable(false);
         });
 
         new Thread(commandTask).start();

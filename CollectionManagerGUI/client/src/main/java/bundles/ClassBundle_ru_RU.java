@@ -150,6 +150,7 @@ public class ClassBundle_ru_RU extends ListResourceBundle {
 
             // Error messages
             {"Server error. Please, try later.", "Ошибка сервера. Пожалуйста, попробуйте позже."},
+            {"Session timeout. Connect again.", "Время сеанса истекло. Подключитесь снова."},
             {"Welcome back, ","С возвращением, "},
             {"Wrong username or password format (From 5 to 15 symbols and they " +
                     "should contains only english letters or digits.)",

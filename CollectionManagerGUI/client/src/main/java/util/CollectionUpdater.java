@@ -1,12 +1,16 @@
 package util;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import commands.UpdateCollection;
 import data.TableViewPerson;
 import data.Person;
 import interfaces.Command;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static guicontrollers.SessionController.loadErrPortChoosingField;
 
 public class CollectionUpdater implements Runnable {
 
@@ -20,24 +24,41 @@ public class CollectionUpdater implements Runnable {
 
     @Override
     public void run() {
-        while (true) {
-            Command updateCollection = new UpdateCollection(null);
-            try {
+        try {
+            while (true) {
+                Command updateCollection = new UpdateCollection(null);
                 connectionManager.sendRequest(updateCollection, authorizationManager.getToken());
                 ArrayList<Person> tmp = connectionManager.readUpdatedCollectionResponse();
-
                 if (tmp != null) {
                     ArrayList<TableViewPerson> extended = getValues(tmp);
                     CollectionWrapper.clearList();
                     CollectionWrapper.addAll(extended);
                 }
                 Thread.sleep(2000);
-
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
             }
+        }
+        catch (InterruptedException e) {
+            System.out.println("Collection updater stopped!");
+        }
+        catch (IOException e) {
+            Platform.runLater(() -> {
+                try {
+                    loadErrPortChoosingField("Server error. Please, try later.");
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            Thread.currentThread().interrupt();
+        }
+        catch (JWTVerificationException e) {
+            Platform.runLater(() -> {
+                try {
+                    loadErrPortChoosingField("Session timeout. Connect again.");
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+            });
+            Thread.currentThread().interrupt();
         }
     }
 
