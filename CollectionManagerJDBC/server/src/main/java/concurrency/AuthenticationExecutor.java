@@ -43,7 +43,7 @@ public class AuthenticationExecutor implements Runnable{
         this.logger = LoggerProvider.getLogger();
         this.collectionManager = collectionManager;
     }
-
+    
     @Override
     public void run() {
         Thread.currentThread().setName("auth thread");

@@ -458,10 +458,10 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     }
 
     private void setZonedDateTimeCellFactory(TableColumn tableColumn) {
-        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, ZonedDateTime>() {
             @Override
             protected void updateItem(ZonedDateTime zdt, boolean empty) {
+                String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
                 super.updateItem(zdt, empty);
                 if (empty)
                     setText(null);
@@ -498,10 +498,10 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     }
 
     private void setLongCellFactory(TableColumn tableColumn) {
-        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Long>() {
             @Override
             protected void updateItem(Long number, boolean empty) {
+                String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
                 super.updateItem(number, empty);
                 if (empty)
                     setText(null);
@@ -512,11 +512,11 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     }
 
     private void setIntegerCellFactory(TableColumn tableColumn) {
-        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Integer>() {
 
             @Override
             protected void updateItem(Integer number, boolean empty) {
+                String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
                 super.updateItem(number, empty);
                 if (empty)
                     setText(null);
@@ -527,11 +527,11 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     }
 
     private void setFloatCellFactory(TableColumn tableColumn) {
-        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Float>() {
 
             @Override
             protected void updateItem(Float number, boolean empty) {
+                String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
                 super.updateItem(number, empty);
                 if (empty)
                     setText(null);
@@ -542,11 +542,11 @@ public class MainControlSceneController extends LanguageChanger implements Initi
     }
 
     private void setDoubleCellFactory(TableColumn tableColumn) {
-        String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
         tableColumn.setCellFactory(col -> new TableCell<TableViewPerson, Double>() {
 
             @Override
             protected void updateItem(Double number, boolean empty) {
+                String countryCode = UserSessionManager.getCurrentBundle().getString("locale");
                 super.updateItem(number, empty);
                 if (empty)
                     setText(null);
@@ -836,9 +836,19 @@ public class MainControlSceneController extends LanguageChanger implements Initi
 
             info.setVisible(false);
             circle.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
-                if(t.getButton() == MouseButton.SECONDARY) {
+                if(t.getButton() == MouseButton.PRIMARY) {
                     try {
                         openUpdateIdFrom2DScene(person);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
+
+            circle.addEventHandler(MouseEvent.MOUSE_CLICKED, t -> {
+                if(t.getButton() == MouseButton.SECONDARY) {
+                    try {
+                        openRemoveByIdScene(String.valueOf(person.getId()));
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }

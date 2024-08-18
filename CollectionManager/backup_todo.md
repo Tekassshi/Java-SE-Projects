@@ -1,5 +1,0 @@
-- not hardcoded filename 1
-- nullable Color 1
-- handle Float Inf & -Inf 1
-- not update creation date on update 1
-- execute_script 

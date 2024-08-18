@@ -1,9 +1,9 @@
 add
 Yandex
-423
-123
-543
-123
+150
+178
+560
+170
 blue
 thailand
 132

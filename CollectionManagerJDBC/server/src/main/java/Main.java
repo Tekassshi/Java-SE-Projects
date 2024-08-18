@@ -17,22 +17,17 @@ public class Main {
             server.configureServer(logger);
             server.run();
         }
-        catch (SocketException e) {
+        catch (SocketException | IllegalArgumentException e) {
             logger.error("Error reading database. Check data for compatibility with current app version. " +
                     "Server stopped.");
             DatabaseManager dbManager = server.getDbManager();
             dbManager.closeConnection();
         }
-        catch (IllegalArgumentException e){
-            logger.error("Error reading database. Check data for compatibility with current app version. " +
-                    "Server stopped.");
-            DatabaseManager dbManager = server.getDbManager();
-            dbManager.closeConnection();
-        } catch (SQLException e) {
+        catch (SQLException e) {
             logger.error("Error access to database. Check \".credentials\" file \nor make sure " +
                     "the database is running. Server stopped.\n");
         }
-        catch (IOException e){
+        catch (IOException e) {
             logger = server.getLogger();
             logger.error("Error reading \".credentials\" file or it's doesn't exist. Server stopped.\n");
         }

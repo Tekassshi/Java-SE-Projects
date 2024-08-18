@@ -65,6 +65,18 @@
     -fx-background-color: #adadad;
 }
 
+.scroll-bar:horizontal {
+    -fx-background-color: #ffffff;
+}
+
+.scroll-bar:horizontal .thumb {
+    -fx-background-color: #c4c4c4;
+}
+
+.scroll-bar:horizontal .thumb:hover {
+    -fx-background-color: #adadad;
+}
+
 .exitButton {
     -fx-background-color: #db5656;
 }
