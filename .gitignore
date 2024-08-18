@@ -2,3 +2,7 @@
 !/.gitignore
 *.pdf
 *.docx
+**/build/
+
+*.jar
+!gradle-wrapper.jar
